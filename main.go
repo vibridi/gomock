@@ -1,15 +1,15 @@
 package main
 
 import (
-	"os"
-	"github.com/urfave/cli"
 	"fmt"
+	"os"
 	regexp "regexp"
 	"strings"
+
+	"github.com/urfave/cli"
 )
 
 const (
-
 	mockTemplate = `
 type mock@@service@@ struct {
 	options mock@@service@@Options
@@ -39,14 +39,12 @@ func newMock@@service@@(opt ...mock@@service@@Option) @@service@@ {
 	}
 }`
 
-
 	mockFunctionDefinition = `func@@method@@  func(@@signature@@) @@return@@`
 
 	mockFunctionDefault = `
 func@@method@@: func(@@signature@@) @@return@@ {
 	return @@return_clause@@
 },`
-
 
 	mockWithFunc = `
 func withFunc@@method@@(f func(@@signature@@) @@return@@) mock@@service@@Option {
@@ -59,9 +57,7 @@ func withFunc@@method@@(f func(@@signature@@) @@return@@) mock@@service@@Option 
 func (m *mock@@service@@) @@method@@(@@signature@@) @@return@@ {
 	return m.options.func@@method@@()
 }`
-
 )
-
 
 func main() {
 	app := cli.NewApp()
@@ -69,6 +65,8 @@ func main() {
 	app.Name = "gomock"
 
 	app.Action = func(c *cli.Context) error {
+
+		// todo check args
 
 		var re *regexp.Regexp
 		intf := strings.TrimSpace(c.Args().Get(0))
