@@ -1,25 +1,37 @@
 package error
 
+import (
+	"github.com/pkg/errors"
+)
+
 const (
+	cantOpenFile          = "failed to open file"
+	notGoSource           = "source is not a Go file"
+	writeError            = "could not write output to destination file"
+	noSource              = "no source specified"
 	noTypeDeclarations    = "source contains no type declarations"
 	interfaceNotSpecified = "source contains multiple types but no target was specified"
 	notFound              = "no suitable type declaration was found in source"
-	typeIsStruct          = "found only struct type in source"
 	noMethods             = "source interface declares no methods"
 )
 
-var NoTypeDeclarations = ParserError{noTypeDeclarations}
+var FileError = GoMockError{cantOpenFile}
+var NotGoSource = GoMockError{notGoSource}
+var WriteError = GoMockError{writeError}
+var NoSource = GoMockError{noSource}
+var NoTypeDeclarations = GoMockError{noTypeDeclarations}
+var InterfaceNotSpecified = GoMockError{interfaceNotSpecified}
+var InterfaceNotFound = GoMockError{notFound}
+var NoMethods = GoMockError{noMethods}
 
-var InterfaceNotSpecified = ParserError{interfaceNotSpecified}
-
-var InterfaceNotFound = ParserError{notFound}
-
-var NoMethods = ParserError{noMethods}
-
-type ParserError struct {
+type GoMockError struct {
 	error string
 }
 
-func (e ParserError) Error() string {
+func (e GoMockError) Error() string {
 	return e.error
+}
+
+func (e GoMockError) Wrap(err error) error {
+	return errors.Wrap(err, e.error)
 }
