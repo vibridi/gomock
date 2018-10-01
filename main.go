@@ -2,14 +2,15 @@ package main
 
 import (
 	"fmt"
-	throws "gomock/error"
-	"gomock/parser"
-	"gomock/version"
-	"gomock/writer"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
+
+	throws "github.com/vibridi/gomock/error"
+	"github.com/vibridi/gomock/parser"
+	"github.com/vibridi/gomock/version"
+	"github.com/vibridi/gomock/writer"
 
 	"github.com/urfave/cli"
 )

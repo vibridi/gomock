@@ -4,7 +4,8 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
-	throws "gomock/error"
+
+	throws "github.com/vibridi/gomock/error"
 )
 
 type MockData struct {

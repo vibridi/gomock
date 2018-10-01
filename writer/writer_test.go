@@ -5,8 +5,9 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
-	gomock "gomock/parser"
 	"testing"
+
+	gomock "github.com/vibridi/gomock/parser"
 
 	"github.com/stretchr/testify/assert"
 )
