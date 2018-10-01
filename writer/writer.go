@@ -18,14 +18,12 @@ type mock{{.ServiceName}} struct {
 }
 
 type mock{{.ServiceName}}Options struct {
-	{{range .FuncDefs}}
-	func{{.Name}}  func({{.Signature}}) {{.Return}}
+	{{range .FuncDefs}}func{{.Name}}  func({{.Signature}}) {{.Return}}
 	{{end}}
 }
 
 var defaultMock{{.ServiceName}}Options = mock{{.ServiceName}}Options{
-	{{range .FuncDefs}}
-	func{{.Name}}: func({{.Signature}}) {{.Return}} {
+	{{range .FuncDefs}}func{{.Name}}: func({{.Signature}}) {{.Return}} {
 		return {{.ReturnValues}}
 	},
 	{{end}}
@@ -43,7 +41,7 @@ func withFunc{{.Name}}(f func({{.Signature}}) {{.Return}}) mock{{.ServiceName}}O
 
 {{range .FuncDefs}}
 func (m *mock{{.ServiceName}}) {{.Name}}({{.Signature}}) {{.Return}} {
-	return m.options.func{{.Name}}({{.Args}})
+	return {{if .Return}}m.options.func{{.Name}}({{.Args}}){{end}}
 }
 {{end}}
 
@@ -262,6 +260,9 @@ func (td *TemplateData) returnValue(expr ast.Expr, qualify bool) string {
 
 		case "bool":
 			return "false"
+
+		case "error":
+			return "nil"
 
 		case
 			"int", "int8", "int16", "int32", "int64",
