@@ -3,11 +3,12 @@ package writer
 import (
 	"bytes"
 	"go/ast"
-	"gomock/helper"
-	"gomock/parser"
 	"strconv"
 	"strings"
 	"text/template"
+
+	"github.com/vibridi/gomock/helper"
+	"github.com/vibridi/gomock/parser"
 )
 
 const (
