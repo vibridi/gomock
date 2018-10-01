@@ -18,5 +18,8 @@ fmt:
 build: clean
 	go build -ldflags=$(BUILD_LDFLAGS) -o build/gomock *.go
 
+install: build
+	mv build/gomock "$(GOPATH)/bin/"
+
 test:
 	go test -v -cover ./...
