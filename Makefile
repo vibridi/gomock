@@ -1,9 +1,10 @@
+.PHONY: fmt deps test clean build
 
 VERSION = $(shell git describe --tags)
-GOVERSION=$(shell go version | cut -c 12-)
+GOVERSION = $(shell go version | cut -c 12-)
 BUILD_LDFLAGS = "\
-          -X \"golang.nulab-inc.com/cacoo/service/account/version.VERSION=$(VERSION)\" \
-          -X \"golang.nulab-inc.com/cacoo/service/account/version.GOVERSION=$(GOVERSION)\""
+          -X \"github.com/vibridi/gomock/version.VERSION=$(VERSION)\" \
+          -X \"github.com/vibridi/gomock/version.GOVERSION=$(GOVERSION)\""
 
 clean:
 	rm -rf build/
