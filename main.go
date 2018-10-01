@@ -21,7 +21,7 @@ func main() {
 	app.Name = "gomock"
 	app.Version = version.Version()
 
-	var src string
+	var srcFile string
 	var dst string
 	var tgt string
 	var qualify bool
@@ -30,7 +30,7 @@ func main() {
 		cli.StringFlag{
 			Name:        "f",
 			Usage:       "Read go code from `FILE`",
-			Destination: &src,
+			Destination: &srcFile,
 		},
 		cli.StringFlag{
 			Name:        "o",
@@ -53,13 +53,13 @@ func main() {
 
 	app.Action = func(c *cli.Context) error {
 
-		fmt.Printf("parsing %s\n", src)
+		fmt.Errorf("parsing %s\n", srcFile)
 
-		if !strings.HasSuffix(src, ".go") {
+		if !strings.HasSuffix(srcFile, ".go") {
 			return throws.NotGoSource
 		}
 
-		f, err := filepath.Abs(src)
+		f, err := filepath.Abs(srcFile)
 		if err != nil {
 			return throws.FileError
 		}
@@ -87,6 +87,6 @@ func main() {
 	}
 
 	if err := app.Run(os.Args); err != nil {
-		fmt.Printf("error: %s\n", err.Error())
+		fmt.Errorf("error: %s\n", err.Error())
 	}
 }
