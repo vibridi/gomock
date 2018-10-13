@@ -52,7 +52,9 @@ func main() {
 	}
 
 	app.Action = func(c *cli.Context) error {
-
+		if srcFile == "" {
+			srcFile = c.Args().Get(0)
+		}
 		fmt.Errorf("parsing %s\n", srcFile)
 
 		if !strings.HasSuffix(srcFile, ".go") {
