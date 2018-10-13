@@ -17,5 +17,8 @@ fmt:
 build: clean
 	go build -ldflags=$(BUILD_LDFLAGS) -o build/gomock *.go
 
+example: build
+	./build/gomock -f _example/_example.go
+
 test:
 	go test -v -cover ./...
