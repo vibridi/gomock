@@ -107,8 +107,10 @@ myMock := newMockTestInterface(
         return "test-value"
     }),
 )
-
 myMock.Get() // "test-value"
+
+objectThatUsesTestInterface := NewObject(myMock)
+// ...
 
 ```
 
