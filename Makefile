@@ -7,22 +7,22 @@ BUILD_LDFLAGS = "\
           -X \"github.com/vibridi/gomock/version.GOVERSION=$(GOVERSION)\""
 
 clean:
-	rm -rf build/
+	rm -rf ./build/
 
 deps:
 	dep ensure -v
 
 fmt:
-	goimports -w _example/ error/ helper/ parser/ version/ writer/ main.go
+	goimports -w ./_example/ error/ helper/ parser/ version/ writer/ main.go
 
 build: clean
-	go build -ldflags=$(BUILD_LDFLAGS) -o build/gomock *.go
+	go build -ldflags=$(BUILD_LDFLAGS) -o ./build/gomock *.go
 
 example: build
 	./build/gomock -f _example/_example.go
 
 install: build
-	mv build/gomock "$(GOPATH)/bin/"
+	mv ./build/gomock $(GOPATH)/bin/
 
 test:
 	go test -v -cover ./...
