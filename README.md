@@ -5,9 +5,9 @@ Automatically generates mock code from a Go interface.
 
 ### Installation
 
-    $ go get github.com/vibridi/gomock
+    $ go get -v github.com/vibridi/gomock
     $ cd $GOPATH/github.com/vibridi/gomock
-    $ go install
+    $ make install
 
 ### Requirements:
    

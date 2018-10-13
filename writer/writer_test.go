@@ -132,6 +132,7 @@ func TestWriter(t *testing.T) {
 			"Get() int16":                  "0",
 			"Get() int32":                  "0",
 			"Get() int64":                  "0",
+			"Get() error":                  "nil",
 			"Get() map[string]int":         "nil",
 			"Get() Test":                   "Test{}",
 			"Get() test.Test":              "test.Test{}",
