@@ -79,6 +79,18 @@ func (fd FuncDef) String() string {
 	return strings.TrimSpace(s)
 }
 
+type ParamName struct {
+	string
+	IsVararg bool
+}
+
+func (pn ParamName) Expand() string {
+	if pn.IsVararg {
+		return pn.string + "..."
+	}
+	return pn.string
+}
+
 func Write(data *parser.MockData, qualify bool) (string, error) {
 
 	if len(data.MethodFields) == 0 {
@@ -118,24 +130,24 @@ func (td *TemplateData) toFuncDef(field *ast.Field, qualify bool) *FuncDef {
 	funcDef.ServiceName = td.ServiceName
 	funcDef.Name = field.Names[0].Name
 
-	paramNames := make([]string, 0, len(fn.Params.List))
+	paramNames := make([]ParamName, 0, len(fn.Params.List))
 	paramTypes := make([]string, 0, len(fn.Params.List))
 
 	for i, p := range fn.Params.List {
 		if len(p.Names) == 0 {
-			paramNames = append(paramNames, "p"+strconv.Itoa(i))
+			paramNames = append(paramNames, td.expressionName(p.Type, "p"+strconv.Itoa(i)))
 			paramTypes = append(paramTypes, td.expressionType(p.Type, qualify))
 
 		} else {
 			for _, n := range p.Names {
-				paramNames = append(paramNames, n.Name)
+				paramNames = append(paramNames, td.expressionName(p.Type, n.Name))
 				paramTypes = append(paramTypes, td.expressionType(p.Type, qualify))
 			}
 		}
 	}
 
-	funcDef.Signature = strings.Join(helper.Zips(paramNames, paramTypes, " "), ", ")
-	funcDef.Args = strings.Join(paramNames, ", ")
+	funcDef.Signature = strings.Join(helper.Zips(justNames(paramNames), paramTypes, " "), ", ")
+	funcDef.Args = strings.Join(expandNames(paramNames), ", ")
 
 	if fn.Results == nil {
 		return funcDef
@@ -186,6 +198,9 @@ func (td *TemplateData) expressionType(expr ast.Expr, qualify bool) string {
 
 	case *ast.ChanType:
 		return chanType(t) + " " + td.expressionType(t.Value, qualify)
+
+	case *ast.Ellipsis:
+		return "..." + td.expressionType(t.Elt, qualify)
 
 	default:
 		return ""
@@ -299,4 +314,25 @@ func (td *TemplateData) returnValue(expr ast.Expr, qualify bool) string {
 	default:
 		return ""
 	}
+}
+
+func (td *TemplateData) expressionName(expr ast.Expr, name string) ParamName {
+	_, isVararg := expr.(*ast.Ellipsis)
+	return ParamName{name, isVararg}
+}
+
+func justNames(paramNames []ParamName) []string {
+	ss := make([]string, 0, len(paramNames))
+	for _, n := range paramNames {
+		ss = append(ss, n.string)
+	}
+	return ss
+}
+
+func expandNames(paramNames []ParamName) []string {
+	ss := make([]string, 0, len(paramNames))
+	for _, n := range paramNames {
+		ss = append(ss, n.Expand())
+	}
+	return ss
 }

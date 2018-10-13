@@ -30,39 +30,39 @@ type TestInterface interface {
 `
 )
 
-func TestParser(t *testing.T) {
+func TestWriter(t *testing.T) {
 
 	t.Run("write func type", func(t *testing.T) {
 		cases := []string{
-			"func()",
-			"func(a string)",
-			"func(c complex128)",
-			"func(string)",
-			"func(string, int)",
-			"func(a, b string)",
-			"func(a, b, c, d string, i int)",
-			"func(a string, i int, g test.TestStruct)",
-			"func(a string, i int, g test.TestStruct)",
-			"func(a string, i int, g, h test.TestStruct)",
-			"func(f func())",
-			"func(a string, f func())",
-			"func(string, func())",
-			"func(f func(f func()))",
-			"func(f func(f func(a string, b, c int, k func(z zap.Logger))))",
-			"func(a []string)",
-			"func(a [][]string)",
-			"func(a [1]string)",
-			"func(a, b [1]string)",
-			"func(a, b []func(a string))",
-			"func(a, b []func(a []string, b func([]int)))",
-			"func(a *string)",
-			"func(a []*string)",
-			"func(a map[string]*string)",
-			"func(a map[string]struct{})",
-			"func(i interface{})",
-			"func(a map[*zap.Logger]test.Test)",
-			"func(ch chan int)",
-			"func(ch chan map[string]chan<- *zap.Logger)",
+			"func()",                                      // no args
+			"func(a string)",                              // one arg identifier
+			"func(c complex128)",                          // one arg identifier
+			"func(string)",                                // one arg no label
+			"func(string, int)",                           // multiple args no label
+			"func(a, b string)",                           // comma-delimited same-type args
+			"func(a, b, c, d string, i int)",              // multiple comma-delimited same-type args
+			"func(a string, i int, g test.TestStruct)",    // qualified name
+			"func(a string, i int, g, h test.TestStruct)", // comma-delimited qualified names
+			"func(f func())",                              // function
+			"func(a string, f func())",                    // function as second arg
+			"func(string, func())",                        // function arg with no label
+			"func(f func(f func()))",                      // nested funcs
+			"func(f func(f func(a string, b, c int, k func(z zap.Logger))))", // nested funcs with multiple args
+			"func(a []string)",                             // slice
+			"func(a [][]string)",                           // 2D slice
+			"func(a [1]string)",                            // array
+			"func(a, b [1]string)",                         // comma-delimited same-type arrays
+			"func(a, b []func(a string))",                  // slice of funcs
+			"func(a, b []func(a []string, b func([]int)))", // slice of nested funcs
+			"func(a *string)",                              // pointer
+			"func(a []*string)",                            // slice of pointers
+			"func(a map[string]*string)",                   // map of pointers
+			"func(a map[string]struct{})",                  // map of structs
+			"func(i interface{})",                          // interface
+			"func(a map[*zap.Logger]test.Test)",            // qualified pointer
+			"func(ch chan int)",                            // chan
+			"func(ch chan map[string]chan<- *zap.Logger)",  // directed chan of complex type
+			"func(ss ...string)",                           // vararg
 		}
 
 		for _, p := range cases {
@@ -98,6 +98,8 @@ func TestParser(t *testing.T) {
 			"Get(ss []string) (string)":                 "Get(ss []string) string",
 			"Get(star *string) (string, error)":         "_",
 			"Get() (string, int64, *zap.Logger, error)": "_",
+			"Get(ss ...string)":                         "_",
+			"Get(ff ...func(string, string))":           "_",
 		}
 
 		for method, expected := range cases {
