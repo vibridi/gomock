@@ -108,6 +108,8 @@ myMock := newMockTestInterface(
     }),
 )
 
+myMock.Get() // "test-value"
+
 ```
 
 ## Current version
