@@ -32,7 +32,7 @@ var defaultMock{{.ServiceName}}Options = mock{{.ServiceName}}Options{
 type mock{{.ServiceName}}Option func(*mock{{.ServiceName}}Options)
 
 {{range .FuncDefs}}
-func {{if .Export}}W{{else}}w{{end}}ithFunc{{.Name}}(f func({{.Signature}}) {{.Return}}) mock{{.ServiceName}}Option {
+func {{if $.Export}}W{{else}}w{{end}}ithFunc{{.Name}}(f func({{.Signature}}) {{.Return}}) mock{{.ServiceName}}Option {
 	return func(o *mock{{.ServiceName}}Options) {
 		o.func{{.Name}} = f
 	}
@@ -96,7 +96,7 @@ func Write(data *parser.MockData, qualify bool, export bool) (string, error) {
 		return "", nil
 	}
 
-	d := toTemplateData(data, qualify)
+	d := toTemplateData(data, qualify, export)
 
 	var buf bytes.Buffer
 	t := template.Must(template.New("mock").Parse(mockTemplate))
@@ -106,9 +106,10 @@ func Write(data *parser.MockData, qualify bool, export bool) (string, error) {
 	return buf.String(), nil
 }
 
-func toTemplateData(data *parser.MockData, qualify bool) *TemplateData {
+func toTemplateData(data *parser.MockData, qualify bool, export bool) *TemplateData {
 	d := &TemplateData{}
 	d.Qualify = qualify
+	d.Export = export
 	d.Package = data.PackageName
 	d.ServiceName = data.InterfaceName
 
