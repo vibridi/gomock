@@ -32,7 +32,7 @@ var defaultMock{{.ServiceName}}Options = mock{{.ServiceName}}Options{
 type mock{{.ServiceName}}Option func(*mock{{.ServiceName}}Options)
 
 {{range .FuncDefs}}
-func withFunc{{.Name}}(f func({{.Signature}}) {{.Return}}) mock{{.ServiceName}}Option {
+func {{if $.Export}}W{{else}}w{{end}}ithFunc{{.Name}}(f func({{.Signature}}) {{.Return}}) mock{{.ServiceName}}Option {
 	return func(o *mock{{.ServiceName}}Options) {
 		o.func{{.Name}} = f
 	}
@@ -45,7 +45,7 @@ func (m *mock{{.ServiceName}}) {{.Name}}({{.Signature}}) {{.Return}} {
 }
 {{end}}
 
-func newMock{{.ServiceName}}(opt ...mock{{.ServiceName}}Option) {{if .Qualify}}{{.Package}}.{{end}}{{.ServiceName}} {
+func {{if .Export}}N{{else}}n{{end}}ewMock{{.ServiceName}}(opt ...mock{{.ServiceName}}Option) {{if .Qualify}}{{.Package}}.{{end}}{{.ServiceName}} {
 	opts := defaultMock{{.ServiceName}}Options
 	for _, o := range opt {
 		o(&opts)
@@ -58,6 +58,7 @@ func newMock{{.ServiceName}}(opt ...mock{{.ServiceName}}Option) {{if .Qualify}}{
 
 type TemplateData struct {
 	Qualify     bool
+	Export      bool
 	Package     string
 	ServiceName string
 	FuncDefs    []*FuncDef
@@ -89,13 +90,13 @@ func (pn ParamName) Expand() string {
 	return pn.string
 }
 
-func Write(data *parser.MockData, qualify bool) (string, error) {
+func Write(data *parser.MockData, qualify bool, export bool) (string, error) {
 
 	if len(data.MethodFields) == 0 {
 		return "", nil
 	}
 
-	d := toTemplateData(data, qualify)
+	d := toTemplateData(data, qualify, export)
 
 	var buf bytes.Buffer
 	t := template.Must(template.New("mock").Parse(mockTemplate))
@@ -105,9 +106,10 @@ func Write(data *parser.MockData, qualify bool) (string, error) {
 	return buf.String(), nil
 }
 
-func toTemplateData(data *parser.MockData, qualify bool) *TemplateData {
+func toTemplateData(data *parser.MockData, qualify bool, export bool) *TemplateData {
 	d := &TemplateData{}
 	d.Qualify = qualify
+	d.Export = export
 	d.Package = data.PackageName
 	d.ServiceName = data.InterfaceName
 
