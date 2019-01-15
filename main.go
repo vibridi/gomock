@@ -25,6 +25,7 @@ func main() {
 	var dst string
 	var tgt string
 	var qualify bool
+	var export bool
 
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
@@ -49,6 +50,11 @@ func main() {
 			Usage:       "Qualify types with the package name",
 			Destination: &qualify,
 		},
+		cli.BoolFlag{
+			Name:        "x",
+			Usage:       "Export `with` and `new` functions",
+			Destination: &export,
+		},
 	}
 
 	app.Action = func(c *cli.Context) error {
@@ -71,7 +77,7 @@ func main() {
 			return err
 		}
 
-		out, err := writer.Write(md, qualify)
+		out, err := writer.Write(md, qualify, export)
 		if err != nil {
 			return throws.WriteError
 		}
