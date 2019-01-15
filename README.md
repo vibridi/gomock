@@ -26,6 +26,7 @@ In short, it supports the following flags:
     $ -o <file> -- output file
     $ -q        -- whether to qualify the type names with the package
     $ -i <name> -- if the source contains multiple interfaces, specify which one to mock
+    $ -x        -- export 'with' and 'new' functions 
     
 ## Example
 
@@ -116,7 +117,7 @@ objectThatUsesTestInterface := NewObject(myMock)
 
 ## Current version
 
-0.0.6
+0.1.0
 
 ## Authors
 
