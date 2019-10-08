@@ -10,7 +10,7 @@ clean:
 	rm -rf ./build/
 
 deps:
-	dep ensure -v
+	go get && go mod tidy
 
 fmt:
 	goimports -w ./_example/ error/ helper/ parser/ version/ writer/ main.go
