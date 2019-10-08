@@ -170,7 +170,7 @@ func (td *TemplateData) toFuncDef(field *ast.Field, qualify bool) *FuncDef {
 func (td *TemplateData) expressionType(expr ast.Expr, qualify bool) string {
 	switch t := expr.(type) {
 	case *ast.Ident:
-		if qualify && t.Obj != nil {
+		if qualify && ast.IsExported(t.Name) {
 			return td.Package + "." + t.Name
 		}
 		return t.Name

@@ -21,6 +21,12 @@ build: clean
 example: build
 	./build/gomock -f _example/_example.go
 
+example-qualify: build
+	./build/gomock -f _example/_qualify.go -q
+
+example-export: build
+	./build/gomock -f _example/_example.go -x
+
 install: build
 	mv ./build/gomock $(GOPATH)/bin/
 
