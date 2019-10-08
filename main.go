@@ -52,7 +52,7 @@ func main() {
 		},
 		cli.BoolFlag{
 			Name:        "x",
-			Usage:       "Export `with` and `new` functions",
+			Usage:       "Export 'with' and 'new' functions",
 			Destination: &export,
 		},
 	}
