@@ -41,7 +41,7 @@ func main() {
 		},
 		cli.StringFlag{
 			Name:        "i",
-			Usage:       "Mock the interface with `IDENTIFIER`",
+			Usage:       "Mock the interface named `IDENTIFIER`",
 			Value:       "",
 			Destination: &tgt,
 		},

@@ -22,11 +22,13 @@ Type `gomock help` for detailed usage tips.
 
 In short, it supports the following flags:
 
-    $ -f <file> -- Go source file 
-    $ -o <file> -- output file
-    $ -q        -- whether to qualify the type names with the package
-    $ -i <name> -- if the source contains multiple interfaces, specify which one to mock
-    $ -x        -- export 'with' and 'new' functions 
+    $ -f FILE        Read go code from FILE
+    $ -o FILE        Output mock code to FILE
+    $ -i IDENTIFIER  Mock the interface with IDENTIFIER
+    $ -q             Qualify types with the package name
+    $ -x             Export 'with' and 'new' functions
+    $ --help, -h     show help
+    $ --version, -v  print the version
     
 ## Example
 
@@ -44,19 +46,15 @@ type mockTestInterface struct {
 }
 
 type mockTestInterfaceOptions struct {
-	
 	funcGet  func() string
-	
 	funcSet  func(v string) 
 	
 }
 
 var defaultMockTestInterfaceOptions = mockTestInterfaceOptions{
-	
 	funcGet: func() string {
 		return ""
 	},
-	
 	funcSet: func(v string)  {
 		return 
 	},
@@ -85,7 +83,7 @@ func (m *mockTestInterface) Get() string {
 }
 
 func (m *mockTestInterface) Set(v string)  {
-	return m.options.funcSet(v)
+	return 
 }
 
 
@@ -114,10 +112,6 @@ objectThatUsesTestInterface := NewObject(myMock)
 // ...
 
 ```
-
-## Current version
-
-0.1.0
 
 ## Authors
 
