@@ -22,13 +22,11 @@ Type `gomock help` for detailed usage tips.
 
 In short, it supports the following flags:
 
-    $ -f FILE        Read go code from FILE
-    $ -o FILE        Output mock code to FILE
-    $ -i IDENTIFIER  Mock the interface with IDENTIFIER
-    $ -q             Qualify types with the package name
-    $ -x             Export 'with' and 'new' functions
-    $ --help, -h     show help
-    $ --version, -v  print the version
+    -f FILE        Read go code from FILE
+    -o FILE        Output mock code to FILE
+    -i IDENTIFIER  Mock the interface with IDENTIFIER
+    -q             Qualify types with the package name
+    -x             Export 'with' and 'new' functions
     
 ## Example
 
