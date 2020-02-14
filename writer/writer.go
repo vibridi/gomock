@@ -23,7 +23,7 @@ type mock{{.ServiceName}}Options struct {
 }
 
 var defaultMock{{.ServiceName}}Options = mock{{.ServiceName}}Options{
-	{{range .FuncDefs}}func{{.Name}}: func({{.Signature}}) {{.Return}} {
+	{{range .FuncDefs}}func{{.Name}}: func({{.SignatureUnnamed}}) {{.Return}} {
 		return {{.ReturnValues}}
 	},
 	{{end}}
@@ -32,7 +32,7 @@ var defaultMock{{.ServiceName}}Options = mock{{.ServiceName}}Options{
 type mock{{.ServiceName}}Option func(*mock{{.ServiceName}}Options)
 
 {{range .FuncDefs}}
-func {{if $.Export}}W{{else}}w{{end}}ithFunc{{.Name}}(f func({{.Signature}}) {{.Return}}) mock{{.ServiceName}}Option {
+func {{if $.Export}}W{{else}}w{{end}}ithFunc{{.Name}}(f func({{.SignatureUnnamed}}) {{.Return}}) mock{{.ServiceName}}Option {
 	return func(o *mock{{.ServiceName}}Options) {
 		o.func{{.Name}} = f
 	}
@@ -65,12 +65,13 @@ type TemplateData struct {
 }
 
 type FuncDef struct {
-	ServiceName  string
-	Name         string
-	Signature    string
-	Return       string
-	Args         string
-	ReturnValues string
+	ServiceName      string
+	Name             string
+	Signature        string
+	SignatureUnnamed string
+	Return           string
+	Args             string
+	ReturnValues     string
 }
 
 func (fd FuncDef) String() string {
@@ -147,6 +148,7 @@ func (td *TemplateData) toFuncDef(field *ast.Field, qualify bool) *FuncDef {
 	}
 
 	funcDef.Signature = strings.Join(helper.Zips(justNames(paramNames), paramTypes, " "), ", ")
+	funcDef.SignatureUnnamed = strings.Join(paramTypes, ", ")
 	funcDef.Args = strings.Join(expandNames(paramNames), ", ")
 
 	if fn.Results == nil {
