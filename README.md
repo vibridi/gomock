@@ -55,7 +55,7 @@ var defaultMockTestInterfaceOptions = mockTestInterfaceOptions{
 	funcGet: func() string {
 		return ""
 	},
-	funcSet: func(v string)  {
+	funcSet: func(string)  {
 		return 
 	},
 	
@@ -70,7 +70,7 @@ func withFuncGet(f func() string) mockTestInterfaceOption {
 	}
 }
 
-func withFuncSet(f func(v string) ) mockTestInterfaceOption {
+func withFuncSet(f func(string) ) mockTestInterfaceOption {
 	return func(o *mockTestInterfaceOptions) {
 		o.funcSet = f
 	}
@@ -115,13 +115,14 @@ objectThatUsesTestInterface := NewObject(myMock)
 
 ## Authors
 
-* **Gabriele Vaccari** - *Initial work* - [Vibridi](https://github.com/vibridi/)
+* **vibridi** - *Initial work* - [Vibridi](https://github.com/vibridi/)
 
 Currently there are no other contributors
 
 ## TODOs
 
-None (for now)
+* Make unnamed parameters optional in default and with* functions
+* Remove extra space between signature and `{` when the function has no return types
 
 ## License
 
