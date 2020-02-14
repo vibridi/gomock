@@ -1,4 +1,9 @@
 
+v0.2.3 / 2020-02-14
+==================
+
+  * Write default and with* functions with unnamed arguments
+
 v0.2.2 / 2019-11-22
 ==================
 
