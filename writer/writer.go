@@ -93,7 +93,7 @@ func (pn ParamName) Expand() string {
 
 func Write(data *parser.MockData, qualify bool, export bool) (string, error) {
 
-	if len(data.MethodFields) == 0 {
+	if data.Len() == 0 {
 		return "", nil
 	}
 
@@ -115,8 +115,23 @@ func toTemplateData(data *parser.MockData, qualify bool, export bool) *TemplateD
 	d.ServiceName = data.InterfaceName
 
 	funcDefs := make([]*FuncDef, 0, len(data.MethodFields))
+
 	for _, field := range data.MethodFields {
 		funcDefs = append(funcDefs, d.toFuncDef(field, qualify))
+	}
+
+	for _, field := range data.Components {
+		local := data.InheritedMethodFields[field.Type.(*ast.Ident).Name]
+		for _, lm := range local {
+			funcDefs = append(funcDefs, d.toFuncDef(lm, qualify))
+		}
+	}
+
+	for _, field := range data.ExternalComponents {
+		imported := data.InheritedMethodFields[field.Type.(*ast.SelectorExpr).Sel.Name]
+		for _, im := range imported {
+			funcDefs = append(funcDefs, d.toFuncDef(im, qualify))
+		}
 	}
 
 	d.FuncDefs = funcDefs

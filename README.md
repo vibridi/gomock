@@ -22,11 +22,20 @@ Type `gomock help` for detailed usage tips.
 
 In short, it supports the following flags:
 
-    -f FILE        Read go code from FILE
-    -o FILE        Output mock code to FILE
-    -i IDENTIFIER  Mock the interface with IDENTIFIER
-    -q             Qualify types with the package name
-    -x             Export 'with' and 'new' functions
+    $ -f FILE        Read go code from FILE
+    $ -o FILE        Output mock code to FILE
+    $ -i IDENTIFIER  Mock the interface with IDENTIFIER
+    $ -q             Qualify types with the package name
+    $ -x             Export 'with' and 'new' functions
+    $ --help, -h     show help
+    $ --version, -v  print the version
+    
+    
+## Features    
+    
+This tool is able to resolve composed interfaces, however all declarations must live 
+in the same directory or sub-directories relative to the main file. To see this in action, run `make example-compose`.
+
     
 ## Example
 
