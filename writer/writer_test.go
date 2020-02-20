@@ -34,35 +34,35 @@ func TestWriter(t *testing.T) {
 
 	t.Run("write func type", func(t *testing.T) {
 		cases := []string{
-			"func()",                                                         // no args
-			"func(a string)",                                                 // one arg identifier
-			"func(c complex128)",                                             // one arg identifier
-			"func(string)",                                                   // one arg no label
-			"func(string, int)",                                              // multiple args no label
-			"func(a, b string)",                                              // comma-delimited same-type args
-			"func(a, b, c, d string, i int)",                                 // multiple comma-delimited same-type args
-			"func(a string, i int, g test.TestStruct)",                       // qualified name
-			"func(a string, i int, g, h test.TestStruct)",                    // comma-delimited qualified names
-			"func(f func())",                                                 // function
-			"func(a string, f func())",                                       // function as second arg
-			"func(string, func())",                                           // function arg with no label
-			"func(f func(f func()))",                                         // nested funcs
+			"func()",                                      // no args
+			"func(a string)",                              // one arg identifier
+			"func(c complex128)",                          // one arg identifier
+			"func(string)",                                // one arg no label
+			"func(string, int)",                           // multiple args no label
+			"func(a, b string)",                           // comma-delimited same-type args
+			"func(a, b, c, d string, i int)",              // multiple comma-delimited same-type args
+			"func(a string, i int, g test.TestStruct)",    // qualified name
+			"func(a string, i int, g, h test.TestStruct)", // comma-delimited qualified names
+			"func(f func())",                              // function
+			"func(a string, f func())",                    // function as second arg
+			"func(string, func())",                        // function arg with no label
+			"func(f func(f func()))",                      // nested funcs
 			"func(f func(f func(a string, b, c int, k func(z zap.Logger))))", // nested funcs with multiple args
-			"func(a []string)",                                               // slice
-			"func(a [][]string)",                                             // 2D slice
-			"func(a [1]string)",                                              // array
-			"func(a, b [1]string)",                                           // comma-delimited same-type arrays
-			"func(a, b []func(a string))",                                    // slice of funcs
-			"func(a, b []func(a []string, b func([]int)))",                   // slice of nested funcs
-			"func(a *string)",                                                // pointer
-			"func(a []*string)",                                              // slice of pointers
-			"func(a map[string]*string)",                                     // map of pointers
-			"func(a map[string]struct{})",                                    // map of structs
-			"func(i interface{})",                                            // interface
-			"func(a map[*zap.Logger]test.Test)",                              // qualified pointer
-			"func(ch chan int)",                                              // chan
-			"func(ch chan map[string]chan<- *zap.Logger)",                    // directed chan of complex type
-			"func(ss ...string)",                                             // vararg
+			"func(a []string)",                             // slice
+			"func(a [][]string)",                           // 2D slice
+			"func(a [1]string)",                            // array
+			"func(a, b [1]string)",                         // comma-delimited same-type arrays
+			"func(a, b []func(a string))",                  // slice of funcs
+			"func(a, b []func(a []string, b func([]int)))", // slice of nested funcs
+			"func(a *string)",                              // pointer
+			"func(a []*string)",                            // slice of pointers
+			"func(a map[string]*string)",                   // map of pointers
+			"func(a map[string]struct{})",                  // map of structs
+			"func(i interface{})",                          // interface
+			"func(a map[*zap.Logger]test.Test)",            // qualified pointer
+			"func(ch chan int)",                            // chan
+			"func(ch chan map[string]chan<- *zap.Logger)",  // directed chan of complex type
+			"func(ss ...string)",                           // vararg
 		}
 
 		for _, p := range cases {
@@ -175,5 +175,6 @@ func TestWriter(t *testing.T) {
 		assert.Nil(t, err)
 		assert.NotEqual(t, "", out)
 	})
-
 }
+
+// TODO composition unit tests

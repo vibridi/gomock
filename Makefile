@@ -27,6 +27,9 @@ example-qualify: build
 example-export: build
 	./build/gomock -f _example/_example.go -x
 
+example-compose: build
+	./build/gomock -f _example/_composition.go
+
 install: build
 	mv ./build/gomock $(GOPATH)/bin/
 

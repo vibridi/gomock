@@ -30,6 +30,14 @@ In short, it supports the following flags:
     $ --help, -h     show help
     $ --version, -v  print the version
     
+    
+## Features    
+    
+This tool is able to resolve composed interfaces, however all declarations must live 
+in the same directory or sub-directories relative to the main file. To see this in action, run `make example-compose`.
+
+ 
+    
 ## Example
 
 To try out the tool after cloning the repo:
