@@ -41,7 +41,7 @@ func main() {
 		},
 		cli.StringFlag{
 			Name:        "i",
-			Usage:       "Mock the interface with `IDENTIFIER`",
+			Usage:       "Mock the interface named `IDENTIFIER`",
 			Value:       "",
 			Destination: &tgt,
 		},
@@ -61,7 +61,7 @@ func main() {
 		if srcFile == "" {
 			srcFile = c.Args().Get(0)
 		}
-		fmt.Errorf("parsing %s\n", srcFile)
+		_, _ = fmt.Fprintf(os.Stderr, "parsing %s\n", srcFile)
 
 		if !strings.HasSuffix(srcFile, ".go") {
 			return throws.NotGoSource
@@ -95,6 +95,6 @@ func main() {
 	}
 
 	if err := app.Run(os.Args); err != nil {
-		fmt.Errorf("error: %s\n", err.Error())
+		_, _ = fmt.Fprintf(os.Stderr, "error: %s\n", err.Error())
 	}
 }
