@@ -1,4 +1,10 @@
 
+v1.0.0 / 2020-02-20
+==================
+
+  * Support composed interfaces
+  * Properly print messages to stderr
+
 v0.2.3 / 2020-02-14
 ==================
 
