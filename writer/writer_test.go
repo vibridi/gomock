@@ -115,7 +115,7 @@ func TestWriter(t *testing.T) {
 
 			td := TemplateData{}
 
-			data := td.toFuncDef(m, false)
+			data := td.toFuncDef(m, WriteOpts{})
 			if expected == "_" {
 				assert.Equal(t, method, data.String())
 			} else {
@@ -171,7 +171,7 @@ func TestWriter(t *testing.T) {
 		md, err := gomock.Parse("", src, "")
 		assert.Nil(t, err)
 
-		out, err := Write(md, false, false)
+		out, err := Write(md, WriteOpts{})
 		assert.Nil(t, err)
 		assert.NotEqual(t, "", out)
 	})

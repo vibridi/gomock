@@ -91,13 +91,19 @@ func (pn ParamName) Expand() string {
 	return pn.string
 }
 
-func Write(data *parser.MockData, qualify bool, export bool) (string, error) {
+type WriteOpts struct {
+	Qualify          bool
+	Export           bool
+	UnnamedSignature bool
+}
+
+func Write(data *parser.MockData, opts WriteOpts) (string, error) {
 
 	if data.Len() == 0 {
 		return "", nil
 	}
 
-	d := toTemplateData(data, qualify, export)
+	d := toTemplateData(data, opts)
 
 	var buf bytes.Buffer
 	t := template.Must(template.New("mock").Parse(mockTemplate))
@@ -107,30 +113,30 @@ func Write(data *parser.MockData, qualify bool, export bool) (string, error) {
 	return buf.String(), nil
 }
 
-func toTemplateData(data *parser.MockData, qualify bool, export bool) *TemplateData {
+func toTemplateData(data *parser.MockData, opts WriteOpts) *TemplateData {
 	d := &TemplateData{}
-	d.Qualify = qualify
-	d.Export = export
+	d.Qualify = opts.Qualify
+	d.Export = opts.Export
 	d.Package = data.PackageName
 	d.ServiceName = data.InterfaceName
 
 	funcDefs := make([]*FuncDef, 0, len(data.MethodFields))
 
 	for _, field := range data.MethodFields {
-		funcDefs = append(funcDefs, d.toFuncDef(field, qualify))
+		funcDefs = append(funcDefs, d.toFuncDef(field, opts))
 	}
 
 	for _, field := range data.Components {
 		local := data.InheritedMethodFields[field.Type.(*ast.Ident).Name]
 		for _, lm := range local {
-			funcDefs = append(funcDefs, d.toFuncDef(lm, qualify))
+			funcDefs = append(funcDefs, d.toFuncDef(lm, opts))
 		}
 	}
 
 	for _, field := range data.ExternalComponents {
 		imported := data.InheritedMethodFields[field.Type.(*ast.SelectorExpr).Sel.Name]
 		for _, im := range imported {
-			funcDefs = append(funcDefs, d.toFuncDef(im, qualify))
+			funcDefs = append(funcDefs, d.toFuncDef(im, opts))
 		}
 	}
 
@@ -138,7 +144,7 @@ func toTemplateData(data *parser.MockData, qualify bool, export bool) *TemplateD
 	return d
 }
 
-func (td *TemplateData) toFuncDef(field *ast.Field, qualify bool) *FuncDef {
+func (td *TemplateData) toFuncDef(field *ast.Field, opts WriteOpts) *FuncDef {
 
 	fn := field.Type.(*ast.FuncType)
 
@@ -174,8 +180,8 @@ func (td *TemplateData) toFuncDef(field *ast.Field, qualify bool) *FuncDef {
 	returnValues := make([]string, 0, len(fn.Results.List))
 
 	for _, r := range fn.Results.List {
-		returnTypes = append(returnTypes, td.expressionType(r.Type, qualify))
-		returnValues = append(returnValues, td.returnValue(r.Type, qualify))
+		returnTypes = append(returnTypes, td.expressionType(r.Type, opts.Qualify))
+		returnValues = append(returnValues, td.returnValue(r.Type, opts.Qualify))
 	}
 
 	funcDef.Return = helper.ReturnTypesToString(returnTypes)

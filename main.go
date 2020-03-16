@@ -77,7 +77,12 @@ func main() {
 			return err
 		}
 
-		out, err := writer.Write(md, qualify, export)
+		opts := writer.WriteOpts{
+			Qualify:          qualify,
+			Export:           export,
+			UnnamedSignature: unnamedsig,
+		}
+		out, err := writer.Write(md, opts)
 		if err != nil {
 			return throws.WriteError
 		}
