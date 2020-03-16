@@ -23,7 +23,7 @@ type mock{{.ServiceName}}Options struct {
 }
 
 var defaultMock{{.ServiceName}}Options = mock{{.ServiceName}}Options{
-	{{range .FuncDefs}}func{{.Name}}: func({{.SignatureUnnamed}}) {{.Return}} {
+	{{range .FuncDefs}}func{{.Name}}: func({{.Signature}}) {{.Return}} {
 		return {{.ReturnValues}}
 	},
 	{{end}}
@@ -32,7 +32,7 @@ var defaultMock{{.ServiceName}}Options = mock{{.ServiceName}}Options{
 type mock{{.ServiceName}}Option func(*mock{{.ServiceName}}Options)
 
 {{range .FuncDefs}}
-func {{if $.Export}}W{{else}}w{{end}}ithFunc{{.Name}}(f func({{.SignatureUnnamed}}) {{.Return}}) mock{{.ServiceName}}Option {
+func {{if $.Export}}W{{else}}w{{end}}ithFunc{{.Name}}(f func({{.Signature}}) {{.Return}}) mock{{.ServiceName}}Option {
 	return func(o *mock{{.ServiceName}}Options) {
 		o.func{{.Name}} = f
 	}
@@ -65,13 +65,12 @@ type TemplateData struct {
 }
 
 type FuncDef struct {
-	ServiceName      string
-	Name             string
-	Signature        string
-	SignatureUnnamed string
-	Return           string
-	Args             string
-	ReturnValues     string
+	ServiceName  string
+	Name         string
+	Signature    string
+	Return       string
+	Args         string
+	ReturnValues string
 }
 
 func (fd FuncDef) String() string {
@@ -91,13 +90,19 @@ func (pn ParamName) Expand() string {
 	return pn.string
 }
 
-func Write(data *parser.MockData, qualify bool, export bool) (string, error) {
+type WriteOpts struct {
+	Qualify          bool
+	Export           bool
+	UnnamedSignature bool
+}
+
+func Write(data *parser.MockData, opts WriteOpts) (string, error) {
 
 	if data.Len() == 0 {
 		return "", nil
 	}
 
-	d := toTemplateData(data, qualify, export)
+	d := toTemplateData(data, opts)
 
 	var buf bytes.Buffer
 	t := template.Must(template.New("mock").Parse(mockTemplate))
@@ -107,30 +112,30 @@ func Write(data *parser.MockData, qualify bool, export bool) (string, error) {
 	return buf.String(), nil
 }
 
-func toTemplateData(data *parser.MockData, qualify bool, export bool) *TemplateData {
+func toTemplateData(data *parser.MockData, opts WriteOpts) *TemplateData {
 	d := &TemplateData{}
-	d.Qualify = qualify
-	d.Export = export
+	d.Qualify = opts.Qualify
+	d.Export = opts.Export
 	d.Package = data.PackageName
 	d.ServiceName = data.InterfaceName
 
 	funcDefs := make([]*FuncDef, 0, len(data.MethodFields))
 
 	for _, field := range data.MethodFields {
-		funcDefs = append(funcDefs, d.toFuncDef(field, qualify))
+		funcDefs = append(funcDefs, d.toFuncDef(field, opts))
 	}
 
 	for _, field := range data.Components {
 		local := data.InheritedMethodFields[field.Type.(*ast.Ident).Name]
 		for _, lm := range local {
-			funcDefs = append(funcDefs, d.toFuncDef(lm, qualify))
+			funcDefs = append(funcDefs, d.toFuncDef(lm, opts))
 		}
 	}
 
 	for _, field := range data.ExternalComponents {
 		imported := data.InheritedMethodFields[field.Type.(*ast.SelectorExpr).Sel.Name]
 		for _, im := range imported {
-			funcDefs = append(funcDefs, d.toFuncDef(im, qualify))
+			funcDefs = append(funcDefs, d.toFuncDef(im, opts))
 		}
 	}
 
@@ -138,7 +143,7 @@ func toTemplateData(data *parser.MockData, qualify bool, export bool) *TemplateD
 	return d
 }
 
-func (td *TemplateData) toFuncDef(field *ast.Field, qualify bool) *FuncDef {
+func (td *TemplateData) toFuncDef(field *ast.Field, opts WriteOpts) *FuncDef {
 
 	fn := field.Type.(*ast.FuncType)
 
@@ -152,18 +157,22 @@ func (td *TemplateData) toFuncDef(field *ast.Field, qualify bool) *FuncDef {
 	for i, p := range fn.Params.List {
 		if len(p.Names) == 0 {
 			paramNames = append(paramNames, td.expressionName(p.Type, "p"+strconv.Itoa(i)))
-			paramTypes = append(paramTypes, td.expressionType(p.Type, qualify))
+			paramTypes = append(paramTypes, td.expressionType(p.Type, opts.Qualify))
 
 		} else {
 			for _, n := range p.Names {
 				paramNames = append(paramNames, td.expressionName(p.Type, n.Name))
-				paramTypes = append(paramTypes, td.expressionType(p.Type, qualify))
+				paramTypes = append(paramTypes, td.expressionType(p.Type, opts.Qualify))
 			}
 		}
 	}
 
-	funcDef.Signature = strings.Join(helper.Zips(justNames(paramNames), paramTypes, " "), ", ")
-	funcDef.SignatureUnnamed = strings.Join(paramTypes, ", ")
+	if !opts.UnnamedSignature {
+		funcDef.Signature = strings.Join(helper.Zips(justNames(paramNames), paramTypes, " "), ", ")
+	} else {
+		funcDef.Signature = strings.Join(paramTypes, ", ")
+	}
+
 	funcDef.Args = strings.Join(expandNames(paramNames), ", ")
 
 	if fn.Results == nil {
@@ -174,8 +183,8 @@ func (td *TemplateData) toFuncDef(field *ast.Field, qualify bool) *FuncDef {
 	returnValues := make([]string, 0, len(fn.Results.List))
 
 	for _, r := range fn.Results.List {
-		returnTypes = append(returnTypes, td.expressionType(r.Type, qualify))
-		returnValues = append(returnValues, td.returnValue(r.Type, qualify))
+		returnTypes = append(returnTypes, td.expressionType(r.Type, opts.Qualify))
+		returnValues = append(returnValues, td.returnValue(r.Type, opts.Qualify))
 	}
 
 	funcDef.Return = helper.ReturnTypesToString(returnTypes)

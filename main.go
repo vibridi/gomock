@@ -26,6 +26,7 @@ func main() {
 	var tgt string
 	var qualify bool
 	var export bool
+	var unnamedsig bool
 
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
@@ -55,6 +56,11 @@ func main() {
 			Usage:       "Export 'with' and 'new' functions",
 			Destination: &export,
 		},
+		cli.BoolFlag{
+			Name:        "u",
+			Usage:       "Output func signatures with unnamed parameters where possible",
+			Destination: &unnamedsig,
+		},
 	}
 
 	app.Action = func(c *cli.Context) error {
@@ -77,7 +83,12 @@ func main() {
 			return err
 		}
 
-		out, err := writer.Write(md, qualify, export)
+		opts := writer.WriteOpts{
+			Qualify:          qualify,
+			Export:           export,
+			UnnamedSignature: unnamedsig,
+		}
+		out, err := writer.Write(md, opts)
 		if err != nil {
 			return throws.WriteError
 		}

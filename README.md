@@ -27,8 +27,12 @@ In short, it supports the following flags:
     $ -i IDENTIFIER  Mock the interface with IDENTIFIER
     $ -q             Qualify types with the package name
     $ -x             Export 'with' and 'new' functions
+    $ -u             Output func signatures with unnamed parameters where possible
     $ --help, -h     show help
     $ --version, -v  print the version
+    
+The `-u` flag allows to output default functions and `With*` functions with unnamed arguments. 
+The default behavior is to always output named arguments, as some IDEs reference them in code completion.     
     
     
 ## Features    
