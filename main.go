@@ -26,6 +26,7 @@ func main() {
 	var tgt string
 	var qualify bool
 	var export bool
+	var unnamedsig bool
 
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
@@ -54,6 +55,11 @@ func main() {
 			Name:        "x",
 			Usage:       "Export 'with' and 'new' functions",
 			Destination: &export,
+		},
+		cli.BoolFlag{
+			Name:        "u",
+			Usage:       "Output func signatures with unnamed parameters where possible",
+			Destination: &unnamedsig,
 		},
 	}
 

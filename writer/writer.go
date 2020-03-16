@@ -23,7 +23,7 @@ type mock{{.ServiceName}}Options struct {
 }
 
 var defaultMock{{.ServiceName}}Options = mock{{.ServiceName}}Options{
-	{{range .FuncDefs}}func{{.Name}}: func({{.SignatureUnnamed}}) {{.Return}} {
+	{{range .FuncDefs}}func{{.Name}}: func({{.Signature}}) {{.Return}} {
 		return {{.ReturnValues}}
 	},
 	{{end}}
@@ -32,7 +32,7 @@ var defaultMock{{.ServiceName}}Options = mock{{.ServiceName}}Options{
 type mock{{.ServiceName}}Option func(*mock{{.ServiceName}}Options)
 
 {{range .FuncDefs}}
-func {{if $.Export}}W{{else}}w{{end}}ithFunc{{.Name}}(f func({{.SignatureUnnamed}}) {{.Return}}) mock{{.ServiceName}}Option {
+func {{if $.Export}}W{{else}}w{{end}}ithFunc{{.Name}}(f func({{.Signature}}) {{.Return}}) mock{{.ServiceName}}Option {
 	return func(o *mock{{.ServiceName}}Options) {
 		o.func{{.Name}} = f
 	}
@@ -65,13 +65,12 @@ type TemplateData struct {
 }
 
 type FuncDef struct {
-	ServiceName      string
-	Name             string
-	Signature        string
-	SignatureUnnamed string
-	Return           string
-	Args             string
-	ReturnValues     string
+	ServiceName  string
+	Name         string
+	Signature    string
+	Return       string
+	Args         string
+	ReturnValues string
 }
 
 func (fd FuncDef) String() string {
@@ -158,18 +157,22 @@ func (td *TemplateData) toFuncDef(field *ast.Field, opts WriteOpts) *FuncDef {
 	for i, p := range fn.Params.List {
 		if len(p.Names) == 0 {
 			paramNames = append(paramNames, td.expressionName(p.Type, "p"+strconv.Itoa(i)))
-			paramTypes = append(paramTypes, td.expressionType(p.Type, qualify))
+			paramTypes = append(paramTypes, td.expressionType(p.Type, opts.Qualify))
 
 		} else {
 			for _, n := range p.Names {
 				paramNames = append(paramNames, td.expressionName(p.Type, n.Name))
-				paramTypes = append(paramTypes, td.expressionType(p.Type, qualify))
+				paramTypes = append(paramTypes, td.expressionType(p.Type, opts.Qualify))
 			}
 		}
 	}
 
-	funcDef.Signature = strings.Join(helper.Zips(justNames(paramNames), paramTypes, " "), ", ")
-	funcDef.SignatureUnnamed = strings.Join(paramTypes, ", ")
+	if !opts.UnnamedSignature {
+		funcDef.Signature = strings.Join(helper.Zips(justNames(paramNames), paramTypes, " "), ", ")
+	} else {
+		funcDef.Signature = strings.Join(paramTypes, ", ")
+	}
+
 	funcDef.Args = strings.Join(expandNames(paramNames), ", ")
 
 	if fn.Results == nil {
