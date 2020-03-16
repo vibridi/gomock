@@ -1,4 +1,10 @@
 
+v1.1.0 / 2020-03-16
+==================
+
+  * Outputting unnamed arguments is opt-in
+  * Pass flags to Write with an options struct
+
 v1.0.0 / 2020-02-20
 ==================
 
