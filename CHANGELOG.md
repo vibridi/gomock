@@ -1,4 +1,12 @@
 
+v2.0.0 / 2020-04-25
+==================
+
+  * Change writer return type to []byte and autoformat
+  * Several changes: - refactor TemplateData into templates package - add Go template for struct style output - instantiate writer with New to avoid passing around the options object
+  * Support --struct-style option
+  * Upgrade urfave/cli to v2
+
 v1.1.0 / 2020-03-16
 ==================
 
