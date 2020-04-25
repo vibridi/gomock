@@ -28,19 +28,16 @@ type mockTestInterface struct {
 }
 
 type mockTestInterfaceOptions struct {
-	funcGet  func() string
-	
+	funcGet func() string
 }
 
 var defaultMockTestInterfaceOptions = mockTestInterfaceOptions{
 	funcGet: func() string {
 		return ""
 	},
-	
 }
 
 type mockTestInterfaceOption func(*mockTestInterfaceOptions)
-
 
 func withFuncGet(f func() string) mockTestInterfaceOption {
 	return func(o *mockTestInterfaceOptions) {
@@ -48,12 +45,9 @@ func withFuncGet(f func() string) mockTestInterfaceOption {
 	}
 }
 
-
-
 func (m *mockTestInterface) Get() string {
 	return m.options.funcGet()
 }
-
 
 func newMockTestInterface(opt ...mockTestInterfaceOption) TestInterface {
 	opts := defaultMockTestInterfaceOptions
@@ -73,7 +67,7 @@ func newMockTestInterface(opt ...mockTestInterfaceOption) TestInterface {
 
 			out, err := New(md, WriteOpts{}).Write()
 			assert.Nil(t, err)
-			assert.Equal(t, c.out, out)
+			assert.Equal(t, c.out, string(out))
 		}
 	})
 
@@ -91,10 +85,8 @@ type TestInterface interface {
 `,
 				out: `
 type mockTestInterface struct {
-	GetFunc  func() string
-	
+	GetFunc func() string
 }
-
 
 func (m *mockTestInterface) Get() string {
 	if m.GetFunc != nil {
@@ -113,7 +105,7 @@ func (m *mockTestInterface) Get() string {
 			out, err := New(md, WriteOpts{StructStyle: true}).Write()
 			fmt.Println(err)
 			assert.Nil(t, err)
-			assert.Equal(t, c.out, out)
+			assert.Equal(t, c.out, string(out))
 		}
 	})
 }

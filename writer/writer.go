@@ -3,6 +3,7 @@ package writer
 import (
 	"bytes"
 	"go/ast"
+	"go/format"
 	"text/template"
 
 	"github.com/vibridi/gomock/writer/templates"
@@ -26,9 +27,9 @@ func New(data *parser.MockData, opts WriteOpts) *writer {
 	return &writer{data, opts}
 }
 
-func (w *writer) Write() (string, error) {
+func (w *writer) Write() ([]byte, error) {
 	if w.data.Len() == 0 {
-		return "", nil
+		return nil, nil
 	}
 
 	d := w.buildTemplateData()
@@ -41,10 +42,10 @@ func (w *writer) Write() (string, error) {
 	var buf bytes.Buffer
 	t := template.Must(template.New("mock").Parse(mockTemplate))
 	if err := t.Execute(&buf, d); err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return buf.String(), nil
+	return format.Source(buf.Bytes())
 }
 
 func (w *writer) buildTemplateData() *templates.Data {

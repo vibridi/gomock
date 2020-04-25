@@ -106,11 +106,11 @@ func main() {
 		}
 
 		if destination == "" {
-			fmt.Println(out)
+			fmt.Println(string(out))
 			return nil
 		}
 
-		if err := ioutil.WriteFile(destination, []byte(out), 0644); err != nil {
+		if err := ioutil.WriteFile(destination, out, 0644); err != nil {
 			return throws.WriteError.Wrap(err)
 		}
 
