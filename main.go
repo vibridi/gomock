@@ -28,6 +28,7 @@ func main() {
 		qualify     bool
 		export      bool
 		unnamedsig  bool
+		structStyle bool
 	)
 
 	app.Flags = []cli.Flag{
@@ -63,6 +64,11 @@ func main() {
 			Usage:       "Output func signatures with unnamed parameters where possible",
 			Destination: &unnamedsig,
 		},
+		&cli.BoolFlag{
+			Usage:       "Prints the output mock in struct style",
+			Destination: &structStyle,
+			Aliases:     []string{"struct-style"},
+		},
 	}
 
 	app.Action = func(c *cli.Context) error {
@@ -85,12 +91,16 @@ func main() {
 			return err
 		}
 
-		opts := writer.WriteOpts{
-			Qualify:          qualify,
-			Export:           export,
-			UnnamedSignature: unnamedsig,
-		}
-		out, err := writer.Write(md, opts)
+		w := writer.New(
+			md,
+			writer.WriteOpts{
+				Qualify:          qualify,
+				Export:           export,
+				UnnamedSignature: unnamedsig,
+				StructStyle:      structStyle,
+			},
+		)
+		out, err := w.Write()
 		if err != nil {
 			return throws.WriteError
 		}

@@ -21,35 +21,35 @@ Optionally: `goimports`, `dep`
 Type `gomock help` for detailed usage tips.
 
 In short, it supports the following flags:
+   
 
-    $ -f FILE        Read go code from FILE
-    $ -o FILE        Output mock code to FILE
-    $ -i IDENTIFIER  Mock the interface with IDENTIFIER
-    $ -q             Qualify types with the package name
-    $ -x             Export 'with' and 'new' functions
-    $ -u             Output func signatures with unnamed parameters where possible
-    $ --help, -h     show help
-    $ --version, -v  print the version
-    
-The `-u` flag allows to output default functions and `With*` functions with unnamed arguments. 
-The default behavior is to always output named arguments, as some IDEs reference them in code completion.     
-    
+- `-f FILE` required, allows to specify the input file where your interface is declared.
+- `-o FILE` if set, tells the program to write the output to `FILE`. Otherwise it just prints to stdout.
+You can always capture the output with a pipe. E.g. if you are on MacOS, you could do `gomock -f myfile.go | pbcopy`
+- `-i IDENTIFIER` if the input file contains more than one interface declaration, you can use the `-i` flag to tell the program which one to parse.
+If not set, the program defaults to the first encountered interface. 
+- `-q` if set, types in the output are qualified with their package names. Useful if your source file imports types from other packages.
+- `-x` if set, static functions are exported (usually those whose name begins with `with` and `new`)
+- `-u` if set, allows to output default functions and `With*` functions with unnamed arguments. 
+The default behavior is to always output named arguments, as some IDEs reference them in code completion.
+- `--struct-style` if set, prints the output in struct style, instead of options style (see below for further details).
+- `--help, -h` prints a help message.
+- `--version, -v` prints the version number.          
     
 ## Features    
     
 This tool is able to resolve composed interfaces, however all declarations must live 
 in the same directory or sub-directories relative to the main file. To see this in action, run `make example-compose`.
 
- 
     
-## Example
+## Example (options style)
 
 To try out the tool after cloning the repo:
 
     $ make build
     $ ./build/gomock -f _example/_example.go
 
-It will print out the generated mock code:
+It will print out the generated mock code, with the options pattern:
 
 
 ```
@@ -123,6 +123,36 @@ myMock.Get() // "test-value"
 objectThatUsesTestInterface := NewObject(myMock)
 // ...
 
+```
+
+## Example (struct style)
+
+To print the mock code in struct style, run:
+
+    $ make build
+    $ ./build/gomock -f _example/_example.go --struct-style
+    
+And it will print:
+
+```
+type mockTestInterface struct {
+	GetFunc  func() string
+	SetFunc  func(v string) 
+}
+
+
+func (m *mockTestInterface) Get() string {
+	if m.GetFunc != nil {
+		return m.GetFunc()
+	}
+	return ""
+}
+
+func (m *mockTestInterface) Set(v string)  {
+	if m.SetFunc != nil {
+		m.SetFunc(v)
+	}
+}
 ```
 
 ## Authors
