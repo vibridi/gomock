@@ -12,7 +12,7 @@ import (
 	"github.com/vibridi/gomock/version"
 	"github.com/vibridi/gomock/writer"
 
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 func main() {
@@ -21,42 +21,44 @@ func main() {
 	app.Name = "gomock"
 	app.Version = version.Version()
 
-	var srcFile string
-	var dst string
-	var tgt string
-	var qualify bool
-	var export bool
-	var unnamedsig bool
+	var (
+		sourceFile  string
+		destination string
+		target      string
+		qualify     bool
+		export      bool
+		unnamedsig  bool
+	)
 
 	app.Flags = []cli.Flag{
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:        "f",
 			Usage:       "Read go code from `FILE`",
-			Destination: &srcFile,
+			Destination: &sourceFile,
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:        "o",
 			Usage:       "Output mock code to `FILE`",
 			Value:       "",
-			Destination: &dst,
+			Destination: &destination,
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:        "i",
 			Usage:       "Mock the interface named `IDENTIFIER`",
 			Value:       "",
-			Destination: &tgt,
+			Destination: &target,
 		},
-		cli.BoolFlag{
+		&cli.BoolFlag{
 			Name:        "q",
 			Usage:       "Qualify types with the package name",
 			Destination: &qualify,
 		},
-		cli.BoolFlag{
+		&cli.BoolFlag{
 			Name:        "x",
 			Usage:       "Export 'with' and 'new' functions",
 			Destination: &export,
 		},
-		cli.BoolFlag{
+		&cli.BoolFlag{
 			Name:        "u",
 			Usage:       "Output func signatures with unnamed parameters where possible",
 			Destination: &unnamedsig,
@@ -64,21 +66,21 @@ func main() {
 	}
 
 	app.Action = func(c *cli.Context) error {
-		if srcFile == "" {
-			srcFile = c.Args().Get(0)
+		if sourceFile == "" {
+			sourceFile = c.Args().Get(0)
 		}
-		_, _ = fmt.Fprintf(os.Stderr, "parsing %s\n", srcFile)
+		_, _ = fmt.Fprintf(os.Stderr, "parsing %s\n", sourceFile)
 
-		if !strings.HasSuffix(srcFile, ".go") {
+		if !strings.HasSuffix(sourceFile, ".go") {
 			return throws.NotGoSource
 		}
 
-		f, err := filepath.Abs(srcFile)
+		f, err := filepath.Abs(sourceFile)
 		if err != nil {
 			return throws.FileError
 		}
 
-		md, err := parser.Parse(f, nil, tgt)
+		md, err := parser.Parse(f, nil, target)
 		if err != nil {
 			return err
 		}
@@ -93,12 +95,12 @@ func main() {
 			return throws.WriteError
 		}
 
-		if dst == "" {
+		if destination == "" {
 			fmt.Println(out)
 			return nil
 		}
 
-		if err := ioutil.WriteFile(dst, []byte(out), 0644); err != nil {
+		if err := ioutil.WriteFile(destination, []byte(out), 0644); err != nil {
 			return throws.WriteError.Wrap(err)
 		}
 
