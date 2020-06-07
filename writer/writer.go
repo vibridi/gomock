@@ -16,6 +16,7 @@ type WriteOpts struct {
 	Export           bool
 	UnnamedSignature bool
 	StructStyle      bool
+	MockName         string
 }
 
 type writer struct {
@@ -55,6 +56,10 @@ func (w *writer) buildTemplateData() *templates.Data {
 		Package:     w.data.PackageName,
 		ServiceName: w.data.InterfaceName,
 		UnnamedSig:  w.opts.UnnamedSignature,
+	}
+	// Override the service name with the one supplied by the user, if any
+	if w.opts.MockName != "" {
+		d.ServiceName = w.opts.MockName
 	}
 
 	funcDefs := make([]*templates.FuncDef, 0, len(w.data.MethodFields))

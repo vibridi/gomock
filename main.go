@@ -32,6 +32,7 @@ func main() {
 		export      bool
 		unnamedsig  bool
 		structStyle bool
+		mockName    string
 	)
 
 	app.Flags = []cli.Flag{
@@ -72,6 +73,12 @@ func main() {
 			Usage:       "Prints the output mock in struct style (default: options style)",
 			Destination: &structStyle,
 		},
+		&cli.StringFlag{
+			Name:        "name",
+			Usage:       "Use `NAME` in output types instead of the name of the mocked interface",
+			Value:       "",
+			Destination: &mockName,
+		},
 	}
 
 	app.Action = func(c *cli.Context) error {
@@ -101,6 +108,7 @@ func main() {
 				Export:           export,
 				UnnamedSignature: unnamedsig,
 				StructStyle:      structStyle,
+				MockName:         mockName,
 			},
 		)
 		out, err := w.Write()

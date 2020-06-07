@@ -108,4 +108,45 @@ func (m *mockTestInterface) Get() string {
 			assert.Equal(t, c.out, string(out))
 		}
 	})
+
+	t.Run("override name", func(t *testing.T) {
+		cases := []struct {
+			in  string
+			out string
+		}{
+			{
+				in: `
+package test
+type TestInterface interface {
+	Get() string
+}
+`,
+				out: `
+type mockOverridden struct {
+	GetFunc func() string
+}
+
+func (m *mockOverridden) Get() string {
+	if m.GetFunc != nil {
+		return m.GetFunc()
+	}
+	return ""
+}
+`,
+			},
+		}
+
+		for _, c := range cases {
+			md, err := gomock.Parse("", c.in, "")
+			assert.Nil(t, err)
+
+			out, err := New(md, WriteOpts{
+				StructStyle: true,
+				MockName:    "Overridden",
+			}).Write()
+			fmt.Println(err)
+			assert.Nil(t, err)
+			assert.Equal(t, c.out, string(out))
+		}
+	})
 }
