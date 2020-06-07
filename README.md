@@ -18,23 +18,31 @@ Optionally: `goimports`, `dep`
 
 ## Usage
 
-Type `gomock help` for detailed usage tips.
+Type `gomock help` for detailed usage tips. Mainly: `gomock { help | [options] filename }`
 
 In short, it supports the following flags:
    
 
-- `-f FILE` required, allows to specify the input file where your interface is declared.
+- `-f FILE` allows to specify the input file where your interface is declared. If not provided, it's assumed 
+the input file is the first argument after other options. 
 - `-o FILE` if set, tells the program to write the output to `FILE`. Otherwise it just prints to stdout.
 You can always capture the output with a pipe. E.g. if you are on MacOS, you could do `gomock -f myfile.go | pbcopy`
 - `-i IDENTIFIER` if the input file contains more than one interface declaration, you can use the `-i` flag to tell the program which one to parse.
 If not set, the program defaults to the first encountered interface. 
-- `-q` if set, types in the output are qualified with their package names. Useful if your source file imports types from other packages.
 - `-x` if set, static functions are exported (usually those whose name begins with `with` and `new`)
 - `-u` if set, allows to output default functions and `With*` functions with unnamed arguments. 
+- `--local` if set, doesn't qualify output mock types with the package name. It qualifies them by default.
 The default behavior is to always output named arguments, as some IDEs reference them in code completion.
-- `--struct-style` if set, prints the output in struct style, instead of options style (see below for further details).
+- `--struct` if set, prints the output in struct style, instead of options style (see below for further details).
+- `--name NAME` allows to override the interface name used in output types with `NAME`.
 - `--help, -h` prints a help message.
-- `--version, -v` prints the version number.          
+- `--version, -v` prints the version number.  
+
+### Breaking changes from version 2.x
+
+- The option `-q` is removed. It's assumed that mocked types are always qualified with their package name. 
+The option `--local` can be used instead to opt out (i.e. to not qualify them).  
+- The option `--struct-type` has been renamed to `--struct`. It has the same effect.      
     
 ## Features    
     
@@ -163,7 +171,6 @@ Currently there are no other contributors
 
 ## TODOs
 
-* Make unnamed parameters optional in default and with* functions
 * Remove extra space between signature and `{` when the function has no return types
 
 ## License
