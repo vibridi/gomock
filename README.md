@@ -163,7 +163,6 @@ Currently there are no other contributors
 
 ## TODOs
 
-* Make unnamed parameters optional in default and with* functions
 * Remove extra space between signature and `{` when the function has no return types
 
 ## License
