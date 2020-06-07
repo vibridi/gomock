@@ -19,6 +19,8 @@ func main() {
 	app := cli.NewApp()
 
 	app.Name = "gomock"
+	app.Usage = "simple interface mocking tool"
+	app.UsageText = "gomock { help | [options] filename }"
 	app.UseShortOptionHandling = true
 	app.Version = version.Version()
 
@@ -35,12 +37,12 @@ func main() {
 	app.Flags = []cli.Flag{
 		&cli.StringFlag{
 			Name:        "f",
-			Usage:       "Read go code from `FILE`",
+			Usage:       "Read input from `FILE`. Must be valid Go code",
 			Destination: &sourceFile,
 		},
 		&cli.StringFlag{
 			Name:        "o",
-			Usage:       "Output mock code to `FILE`",
+			Usage:       "Write output to `FILE`",
 			Value:       "",
 			Destination: &destination,
 		},
@@ -66,9 +68,14 @@ func main() {
 			Destination: &unnamedsig,
 		},
 		&cli.BoolFlag{
-			Usage:       "Prints the output mock in struct style",
+			Name:        "local",
+			Usage:       "Don't qualify types with the package name",
+			Destination: &noQualify,
+		},
+		&cli.BoolFlag{
+			Name:        "struct",
+			Usage:       "Prints the output mock in struct style (default: options style)",
 			Destination: &structStyle,
-			Aliases:     []string{"struct-style"},
 		},
 	}
 
@@ -110,7 +117,6 @@ func main() {
 			fmt.Println(string(out))
 			return nil
 		}
-
 		if err := ioutil.WriteFile(destination, out, 0644); err != nil {
 			return throws.WriteError.Wrap(err)
 		}
