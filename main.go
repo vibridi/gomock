@@ -19,6 +19,7 @@ func main() {
 	app := cli.NewApp()
 
 	app.Name = "gomock"
+	app.UseShortOptionHandling = true
 	app.Version = version.Version()
 
 	var (
