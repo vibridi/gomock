@@ -28,7 +28,7 @@ func main() {
 		sourceFile  string
 		destination string
 		target      string
-		qualify     bool
+		noQualify   bool
 		export      bool
 		unnamedsig  bool
 		structStyle bool
@@ -51,11 +51,6 @@ func main() {
 			Usage:       "Mock the interface named `IDENTIFIER`",
 			Value:       "",
 			Destination: &target,
-		},
-		&cli.BoolFlag{
-			Name:        "q",
-			Usage:       "Qualify types with the package name",
-			Destination: &qualify,
 		},
 		&cli.BoolFlag{
 			Name:        "x",
@@ -102,7 +97,7 @@ func main() {
 		w := writer.New(
 			md,
 			writer.WriteOpts{
-				Qualify:          qualify,
+				Qualify:          !noQualify,
 				Export:           export,
 				UnnamedSignature: unnamedsig,
 				StructStyle:      structStyle,
