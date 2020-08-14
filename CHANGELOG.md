@@ -1,3 +1,13 @@
+v3.0.0 / 2020-06-07
+==================
+
+  * Create go.yml
+  * Update Readme with breaking changes from v2
+  * Add 'name' option to override the name of the interface
+  * Invert '-q' flag. Qualify with package name by default, and require specific flag to opt out instead. Assumption is that you don't need mocks within their own package.
+  * Improve usage tip, title and flag help messages
+  * Allow short options (one dash followed by N options)
+  * Remove implemented unnamed params TODO from Readme
 
 v2.0.0 / 2020-04-25
 ==================
