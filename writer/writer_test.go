@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	gomock "github.com/vibridi/gomock/parser"
+	gomock "github.com/vibridi/gomock/v3/parser"
 
 	"github.com/stretchr/testify/assert"
 )

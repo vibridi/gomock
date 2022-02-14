@@ -1,13 +1,12 @@
 package parser
 
 import (
+	"errors"
 	"go/ast"
 	"go/parser"
 	"go/token"
 	"os"
 	"path/filepath"
-
-	throws "github.com/vibridi/gomock/error"
 )
 
 type MockData struct {
@@ -39,7 +38,7 @@ func Parse(srcFile string, src interface{}, target string) (*MockData, error) {
 	interfaceType := spec.Type.(*ast.InterfaceType)
 
 	if interfaceType.Incomplete {
-		return nil, throws.NoMethods
+		return nil, errors.New("source interface declares no methods")
 	}
 
 	md.InterfaceName = spec.Name.Name
@@ -75,7 +74,7 @@ func GetInterfaceSpec(f *ast.File, target string) (*ast.TypeSpec, error) {
 	var spec *ast.TypeSpec
 	switch len(interfaces) {
 	case 0:
-		return nil, throws.NoTypeDeclarations
+		return nil, errors.New("source contains no type declarations")
 
 	case 1:
 		spec = interfaces[first]
@@ -93,7 +92,7 @@ func GetInterfaceSpec(f *ast.File, target string) (*ast.TypeSpec, error) {
 		}
 	}
 	if spec == nil {
-		return nil, throws.InterfaceNotFound
+		return nil, errors.New("no suitable type declaration was found in source")
 	}
 
 	return spec, nil

@@ -1,16 +1,15 @@
 package main
 
 import (
+	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
 
-	throws "github.com/vibridi/gomock/error"
-	"github.com/vibridi/gomock/parser"
-	"github.com/vibridi/gomock/version"
-	"github.com/vibridi/gomock/writer"
+	"github.com/vibridi/gomock/v3/parser"
+	"github.com/vibridi/gomock/v3/version"
+	"github.com/vibridi/gomock/v3/writer"
 
 	"github.com/urfave/cli/v2"
 )
@@ -88,12 +87,12 @@ func main() {
 		_, _ = fmt.Fprintf(os.Stderr, "parsing %s\n", sourceFile)
 
 		if !strings.HasSuffix(sourceFile, ".go") {
-			return throws.NotGoSource
+			return errors.New("source is not a Go file")
 		}
 
 		f, err := filepath.Abs(sourceFile)
 		if err != nil {
-			return throws.FileError
+			return fmt.Errorf("failed to open file: %w", err)
 		}
 
 		md, err := parser.Parse(f, nil, target)
@@ -113,15 +112,15 @@ func main() {
 		)
 		out, err := w.Write()
 		if err != nil {
-			return throws.WriteError
+			return fmt.Errorf("failed to write output: %w", err)
 		}
 
 		if destination == "" {
 			fmt.Println(string(out))
 			return nil
 		}
-		if err := ioutil.WriteFile(destination, out, 0644); err != nil {
-			return throws.WriteError.Wrap(err)
+		if err := os.WriteFile(destination, out, 0644); err != nil {
+			return fmt.Errorf("failed to write destination file: %w", err)
 		}
 
 		return nil

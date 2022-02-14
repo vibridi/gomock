@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	gomock "github.com/vibridi/gomock/parser"
+	gomock "github.com/vibridi/gomock/v3/parser"
 )
 
 const (

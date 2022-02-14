@@ -6,9 +6,9 @@ import (
 	"go/format"
 	"text/template"
 
-	"github.com/vibridi/gomock/writer/templates"
+	"github.com/vibridi/gomock/v3/writer/templates"
 
-	"github.com/vibridi/gomock/parser"
+	"github.com/vibridi/gomock/v3/parser"
 )
 
 type WriteOpts struct {

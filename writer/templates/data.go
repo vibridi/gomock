@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/vibridi/gomock/helper"
+	"github.com/vibridi/gomock/v3/helper"
 )
 
 type Data struct {
