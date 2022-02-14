@@ -5,15 +5,11 @@ Automatically generates mock code from a Go interface.
 
 ### Installation
 
-    $ go get -v github.com/vibridi/gomock
-    $ cd $GOPATH/github.com/vibridi/gomock
-    $ make install
+    $ go install github.com/vibridi/gomock/v3@latest
 
 ### Requirements:
    
-Go 1.11
-
-Optionally: `goimports`, `dep`
+Go 1.17
 
 
 ## Usage
