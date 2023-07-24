@@ -2,6 +2,10 @@
 
 Automatically generates mock code from a Go interface.  
 
+### Status
+
+This project is actively maintained. Commits are infrequent because it reached 
+a certain degree of stability and no additional features are needed at this time.
 
 ### Installation
 
@@ -161,7 +165,7 @@ func (m *mockTestInterface) Set(v string)  {
 
 ## Authors
 
-* **vibridi** - *Initial work* - [Vibridi](https://github.com/vibridi/)
+* **[Gabriele V.](https://github.com/vibridi/)** - *Initial work and maintenance*
 
 Currently there are no other contributors
 
