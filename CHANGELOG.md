@@ -1,3 +1,10 @@
+
+v3.1.1 / 2023-07-24
+==================
+
+  * Add status notice to README
+  * Upgrade libraries
+
 v3.0.0 / 2020-06-07
 ==================
 
