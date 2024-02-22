@@ -15,6 +15,7 @@ type Data struct {
 	ServiceName string
 	FuncDefs    []*FuncDef
 	UnnamedSig  bool
+	Underlying  map[string]string
 }
 
 func (td *Data) ToFuncDef(field *ast.Field) *FuncDef {
@@ -164,16 +165,12 @@ func arrayLength(arr *ast.ArrayType) string {
 func (td *Data) returnValue(expr ast.Expr) string {
 	switch t := expr.(type) {
 	case *ast.Ident:
-		if t.Obj != nil {
-			if td.Qualify {
-				return td.Package + "." + t.Name + "{}"
-			}
-			return t.Name + "{}"
-		}
+		// the case of an identifier that's not a selector expression is matched by
+		// a named type that belongs to the same package as the mocked interface
 
 		switch t.Name {
 		case "string":
-			return "\"\""
+			return `""`
 
 		case "bool":
 			return "false"
@@ -191,11 +188,22 @@ func (td *Data) returnValue(expr ast.Expr) string {
 			return "0.0"
 
 		default:
-			return t.Name + "{}"
+			qname := td.qualifiedName(t)
+			u, ok := td.Underlying[qname]
+			if !ok {
+				return qname + "{}"
+			}
+			// then consider the underlying type
+			return td.returnValue(&ast.Ident{Name: u})
 		}
 
 	case *ast.SelectorExpr:
-		return t.X.(*ast.Ident).Name + "." + t.Sel.Name + "{}"
+		tname := t.X.(*ast.Ident).Name + "." + t.Sel.Name
+		u, ok := td.Underlying[tname]
+		if ok {
+			return td.returnValue(&ast.Ident{Name: u})
+		}
+		return tname + "{}"
 
 	case
 		*ast.StarExpr,
@@ -222,6 +230,16 @@ func (td *Data) returnValue(expr ast.Expr) string {
 func (td *Data) expressionName(expr ast.Expr, name string) ParamName {
 	_, isVararg := expr.(*ast.Ellipsis)
 	return ParamName{name, isVararg}
+}
+
+func (td *Data) qualifiedName(ident *ast.Ident) string {
+	if td.Package == "" {
+		return ident.Name
+	}
+	if td.Qualify {
+		return td.Package + "." + ident.Name
+	}
+	return ident.Name
 }
 
 func justNames(paramNames []ParamName) []string {

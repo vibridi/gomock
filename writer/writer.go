@@ -4,11 +4,11 @@ import (
 	"bytes"
 	"go/ast"
 	"go/format"
+	"strings"
 	"text/template"
 
-	"github.com/vibridi/gomock/v3/writer/templates"
-
 	"github.com/vibridi/gomock/v3/parser"
+	"github.com/vibridi/gomock/v3/writer/templates"
 )
 
 type WriteOpts struct {
@@ -17,6 +17,7 @@ type WriteOpts struct {
 	UnnamedSignature bool
 	StructStyle      bool
 	MockName         string
+	Underlying       []string
 }
 
 type writer struct {
@@ -56,10 +57,19 @@ func (w *writer) buildTemplateData() *templates.Data {
 		Package:     w.data.PackageName,
 		ServiceName: w.data.InterfaceName,
 		UnnamedSig:  w.opts.UnnamedSignature,
+		Underlying:  make(map[string]string, len(w.opts.Underlying)),
 	}
 	// Override the service name with the one supplied by the user, if any
 	if w.opts.MockName != "" {
 		d.ServiceName = w.opts.MockName
+	}
+
+	for _, utype := range w.opts.Underlying {
+		t, u, ok := strings.Cut(utype, "=")
+		if !ok {
+			continue // todo: error message here?
+		}
+		d.Underlying[t] = u
 	}
 
 	funcDefs := make([]*templates.FuncDef, 0, len(w.data.MethodFields))

@@ -32,6 +32,7 @@ func main() {
 		unnamedsig  bool
 		structStyle bool
 		mockName    string
+		underlying  cli.StringSlice
 	)
 
 	app.Flags = []cli.Flag{
@@ -78,6 +79,12 @@ func main() {
 			Value:       "",
 			Destination: &mockName,
 		},
+		&cli.StringSliceFlag{
+			Name:        "utype",
+			Usage:       "Maps a type to its underlying type. `MAPPING` must in the format 'type=underlying'",
+			Value:       nil,
+			Destination: &underlying,
+		},
 	}
 
 	app.Action = func(c *cli.Context) error {
@@ -108,6 +115,7 @@ func main() {
 				UnnamedSignature: unnamedsig,
 				StructStyle:      structStyle,
 				MockName:         mockName,
+				Underlying:       underlying.Value(),
 			},
 		)
 		out, err := w.Write()

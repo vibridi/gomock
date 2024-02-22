@@ -1,7 +1,6 @@
 package writer
 
 import (
-	"fmt"
 	"testing"
 
 	gomock "github.com/vibridi/gomock/v3/parser"
@@ -103,7 +102,6 @@ func (m *mockTestInterface) Get() string {
 			assert.Nil(t, err)
 
 			out, err := New(md, WriteOpts{StructStyle: true}).Write()
-			fmt.Println(err)
 			assert.Nil(t, err)
 			assert.Equal(t, c.out, string(out))
 		}
@@ -144,7 +142,197 @@ func (m *mockOverridden) Get() string {
 				StructStyle: true,
 				MockName:    "Overridden",
 			}).Write()
-			fmt.Println(err)
+			assert.Nil(t, err)
+			assert.Equal(t, c.out, string(out))
+		}
+	})
+
+	t.Run("write with underlying type", func(t *testing.T) {
+		cases := []struct {
+			in  string
+			out string
+		}{
+			{
+				in: `
+package test
+type TestInterface interface {
+	Get() foo.Foo
+}
+`,
+				out: `
+type mockTestInterface struct {
+	options mockTestInterfaceOptions
+}
+
+type mockTestInterfaceOptions struct {
+	funcGet func() foo.Foo
+}
+
+var defaultMockTestInterfaceOptions = mockTestInterfaceOptions{
+	funcGet: func() foo.Foo {
+		return 0
+	},
+}
+
+type mockTestInterfaceOption func(*mockTestInterfaceOptions)
+
+func withFuncGet(f func() foo.Foo) mockTestInterfaceOption {
+	return func(o *mockTestInterfaceOptions) {
+		o.funcGet = f
+	}
+}
+
+func (m *mockTestInterface) Get() foo.Foo {
+	return m.options.funcGet()
+}
+
+func newMockTestInterface(opt ...mockTestInterfaceOption) TestInterface {
+	opts := defaultMockTestInterfaceOptions
+	for _, o := range opt {
+		o(&opts)
+	}
+	return &mockTestInterface{
+		options: opts,
+	}
+}`,
+			},
+		}
+
+		for _, c := range cases {
+			md, err := gomock.Parse("", c.in, "")
+			assert.Nil(t, err)
+
+			out, err := New(md, WriteOpts{
+				Underlying: []string{"foo.Foo=int"},
+			}).Write()
+			assert.Nil(t, err)
+			assert.Equal(t, c.out, string(out))
+		}
+	})
+
+	t.Run("write with underlying type of qualified type", func(t *testing.T) {
+		cases := []struct {
+			in  string
+			out string
+		}{
+			{
+				in: `
+package test
+type TestInterface interface {
+	Get() Foo
+}
+`,
+				out: `
+type mockTestInterface struct {
+	options mockTestInterfaceOptions
+}
+
+type mockTestInterfaceOptions struct {
+	funcGet func() test.Foo
+}
+
+var defaultMockTestInterfaceOptions = mockTestInterfaceOptions{
+	funcGet: func() test.Foo {
+		return 0
+	},
+}
+
+type mockTestInterfaceOption func(*mockTestInterfaceOptions)
+
+func withFuncGet(f func() test.Foo) mockTestInterfaceOption {
+	return func(o *mockTestInterfaceOptions) {
+		o.funcGet = f
+	}
+}
+
+func (m *mockTestInterface) Get() test.Foo {
+	return m.options.funcGet()
+}
+
+func newMockTestInterface(opt ...mockTestInterfaceOption) test.TestInterface {
+	opts := defaultMockTestInterfaceOptions
+	for _, o := range opt {
+		o(&opts)
+	}
+	return &mockTestInterface{
+		options: opts,
+	}
+}`,
+			},
+		}
+
+		for _, c := range cases {
+			md, err := gomock.Parse("", c.in, "")
+			assert.Nil(t, err)
+
+			out, err := New(md, WriteOpts{
+				Qualify:    true,
+				Underlying: []string{"test.Foo=int"},
+			}).Write()
+			assert.Nil(t, err)
+			assert.Equal(t, c.out, string(out))
+		}
+	})
+
+	t.Run("write with underlying type of local type", func(t *testing.T) {
+		cases := []struct {
+			in  string
+			out string
+		}{
+			{
+				in: `
+package test
+type TestInterface interface {
+	Get() Foo
+}
+`,
+				out: `
+type mockTestInterface struct {
+	options mockTestInterfaceOptions
+}
+
+type mockTestInterfaceOptions struct {
+	funcGet func() Foo
+}
+
+var defaultMockTestInterfaceOptions = mockTestInterfaceOptions{
+	funcGet: func() Foo {
+		return 0
+	},
+}
+
+type mockTestInterfaceOption func(*mockTestInterfaceOptions)
+
+func withFuncGet(f func() Foo) mockTestInterfaceOption {
+	return func(o *mockTestInterfaceOptions) {
+		o.funcGet = f
+	}
+}
+
+func (m *mockTestInterface) Get() Foo {
+	return m.options.funcGet()
+}
+
+func newMockTestInterface(opt ...mockTestInterfaceOption) TestInterface {
+	opts := defaultMockTestInterfaceOptions
+	for _, o := range opt {
+		o(&opts)
+	}
+	return &mockTestInterface{
+		options: opts,
+	}
+}`,
+			},
+		}
+
+		for _, c := range cases {
+			md, err := gomock.Parse("", c.in, "")
+			assert.Nil(t, err)
+
+			out, err := New(md, WriteOpts{
+				Qualify:    false,
+				Underlying: []string{"Foo=int"},
+			}).Write()
 			assert.Nil(t, err)
 			assert.Equal(t, c.out, string(out))
 		}
