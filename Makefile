@@ -30,8 +30,5 @@ example-export: build
 example-compose: build
 	./build/gomock -f _example/_composition.go
 
-install: build
-	mv ./build/gomock $(GOPATH)/bin/
-
 test:
 	go test -v -cover ./...
