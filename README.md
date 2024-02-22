@@ -13,7 +13,7 @@ a certain degree of stability and no additional features are needed at this time
 
 ### Requirements:
    
-Go 1.17
+Go 1.22.0
 
 
 ## Usage
@@ -35,6 +35,7 @@ If not set, the program defaults to the first encountered interface.
 The default behavior is to always output named arguments, as some IDEs reference them in code completion.
 - `--struct` if set, prints the output in struct style, instead of options style (see below for further details).
 - `--name NAME` allows to override the interface name used in output types with `NAME`.
+- `--utype MAPPING [ --utype MAPPING ]` allows to manually specify the underlying type of a named type.
 - `--help, -h` prints a help message.
 - `--version, -v` prints the version number.  
 
