@@ -1,5 +1,7 @@
 # gomock
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/vibridi/gomock)](https://goreportcard.com/report/github.com/vibridi/gomock)
+
 Automatically generates mock code from a Go interface.  
 
 ### Status
