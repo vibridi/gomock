@@ -1,4 +1,12 @@
 
+v3.2.0 / 2024-02-23
+==================
+
+  * Update README
+  * Remove install target, locally it's possible to install just with 'go install'
+  * Add --utype flag to map named types to underlying types via CLI
+  * Upgrade required Go version to 1.22.0
+
 v3.1.2 / 2023-09-21
 ==================
 
