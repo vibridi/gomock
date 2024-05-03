@@ -3,8 +3,8 @@
 VERSION = $(shell git describe --tags)
 GOVERSION = $(shell go version | cut -c 12-)
 BUILD_LDFLAGS = "\
-          -X \"github.com/vibridi/gomock/version.VERSION=$(VERSION)\" \
-          -X \"github.com/vibridi/gomock/version.GOVERSION=$(GOVERSION)\""
+          -X \"github.com/vibridi/gomock/v3/version.VERSION=$(VERSION)\" \
+          -X \"github.com/vibridi/gomock/v3/version.GOVERSION=$(GOVERSION)\""
 
 clean:
 	rm -rf ./build/
@@ -17,6 +17,9 @@ fmt:
 
 build: clean
 	go build -ldflags=$(BUILD_LDFLAGS) -o ./build/gomock *.go
+
+install: clean
+	go install -ldflags=$(BUILD_LDFLAGS)
 
 example: build
 	./build/gomock -f _example/_example.go
