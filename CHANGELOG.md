@@ -1,4 +1,10 @@
 
+v3.2.1 / 2024-05-03
+==================
+
+  * Fix module path when setting VERSION and GOVERSION via ldflags in Makefile
+  * Add goreport.com badge
+
 v3.2.0 / 2024-02-23
 ==================
 
