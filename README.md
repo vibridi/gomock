@@ -32,7 +32,10 @@ You can always capture the output with a pipe. E.g. if you are on MacOS, you cou
 - `-i IDENTIFIER` if the input file contains more than one interface declaration, you can use the `-i` flag to tell the program which one to parse.
 If not set, the program defaults to the first encountered interface. 
 - `-x` if set, static functions are exported (usually those whose name begins with `with` and `new`)
-- `-u` if set, allows to output default functions and `With*` functions with unnamed arguments. 
+- `-u` if set, allows to output default functions and `With*` functions with unnamed arguments.
+- `-d` if set, outputs top-level `withFunc` function identifiers with the name of the service. This is useful
+to avoid "function redeclared" errors when mocks of interfaces with identical method names exist in the same package. 
+For example, if the service name is `MyService` then `withFuncDoSomething` becomes `withFuncMyServiceDoSomething`. 
 - `--local` if set, doesn't qualify output mock types with the package name. It qualifies them by default.
 The default behavior is to always output named arguments, as some IDEs reference them in code completion.
 - `--struct` if set, prints the output in struct style, instead of options style (see below for further details).

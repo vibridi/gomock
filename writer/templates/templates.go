@@ -20,7 +20,7 @@ var defaultMock{{.ServiceName}}Options = mock{{.ServiceName}}Options{
 type mock{{.ServiceName}}Option func(*mock{{.ServiceName}}Options)
 
 {{range .FuncDefs}}
-func {{if $.Export}}W{{else}}w{{end}}ithFunc{{.Name}}(f func({{.Signature}}) {{.Return}}) mock{{.ServiceName}}Option {
+func {{if $.Export}}W{{else}}w{{end}}ithFunc{{if $.Disambiguate}}{{.ServiceName}}{{.Name}}{{else}}{{.Name}}{{end}}(f func({{.Signature}}) {{.Return}}) mock{{.ServiceName}}Option {
 	return func(o *mock{{.ServiceName}}Options) {
 		o.func{{.Name}} = f
 	}

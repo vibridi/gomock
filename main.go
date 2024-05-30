@@ -24,15 +24,16 @@ func main() {
 	app.Version = version.Version()
 
 	var (
-		sourceFile  string
-		destination string
-		target      string
-		noQualify   bool
-		export      bool
-		unnamedsig  bool
-		structStyle bool
-		mockName    string
-		underlying  cli.StringSlice
+		sourceFile   string
+		destination  string
+		target       string
+		noQualify    bool
+		export       bool
+		unnamedsig   bool
+		structStyle  bool
+		mockName     string
+		underlying   cli.StringSlice
+		disambiguate bool
 	)
 
 	app.Flags = []cli.Flag{
@@ -62,6 +63,11 @@ func main() {
 			Name:        "u",
 			Usage:       "Output func signatures with unnamed parameters where possible",
 			Destination: &unnamedsig,
+		},
+		&cli.BoolFlag{
+			Name:        "d",
+			Usage:       "Disambiguate 'withFunc' identifiers with service name, e.g. withFuncMyServiceGet()",
+			Destination: &disambiguate,
 		},
 		&cli.BoolFlag{
 			Name:        "local",
@@ -114,6 +120,7 @@ func main() {
 				Export:           export,
 				UnnamedSignature: unnamedsig,
 				StructStyle:      structStyle,
+				Disambiguate:     disambiguate,
 				MockName:         mockName,
 				Underlying:       underlying.Value(),
 			},

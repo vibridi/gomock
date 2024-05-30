@@ -16,6 +16,7 @@ type WriteOpts struct {
 	Export           bool
 	UnnamedSignature bool
 	StructStyle      bool
+	Disambiguate     bool
 	MockName         string
 	Underlying       []string
 }
@@ -52,12 +53,13 @@ func (w *writer) Write() ([]byte, error) {
 
 func (w *writer) buildTemplateData() *templates.Data {
 	d := &templates.Data{
-		Qualify:     w.opts.Qualify,
-		Export:      w.opts.Export,
-		Package:     w.data.PackageName,
-		ServiceName: w.data.InterfaceName,
-		UnnamedSig:  w.opts.UnnamedSignature,
-		Underlying:  make(map[string]string, len(w.opts.Underlying)),
+		Qualify:      w.opts.Qualify,
+		Export:       w.opts.Export,
+		Disambiguate: w.opts.Disambiguate,
+		Package:      w.data.PackageName,
+		ServiceName:  w.data.InterfaceName,
+		UnnamedSig:   w.opts.UnnamedSignature,
+		Underlying:   make(map[string]string, len(w.opts.Underlying)),
 	}
 	// Override the service name with the one supplied by the user, if any
 	if w.opts.MockName != "" {

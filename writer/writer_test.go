@@ -337,4 +337,67 @@ func newMockTestInterface(opt ...mockTestInterfaceOption) TestInterface {
 			assert.Equal(t, c.out, string(out))
 		}
 	})
+
+	t.Run("disambiguate", func(t *testing.T) {
+		cases := []struct {
+			in  string
+			out string
+		}{
+			{
+				in: `
+package test
+type TestInterface interface {
+	Get() int
+}
+`,
+				out: `
+type mockTestInterface struct {
+	options mockTestInterfaceOptions
+}
+
+type mockTestInterfaceOptions struct {
+	funcGet func() int
+}
+
+var defaultMockTestInterfaceOptions = mockTestInterfaceOptions{
+	funcGet: func() int {
+		return 0
+	},
+}
+
+type mockTestInterfaceOption func(*mockTestInterfaceOptions)
+
+func withFuncTestInterfaceGet(f func() int) mockTestInterfaceOption {
+	return func(o *mockTestInterfaceOptions) {
+		o.funcGet = f
+	}
+}
+
+func (m *mockTestInterface) Get() int {
+	return m.options.funcGet()
+}
+
+func newMockTestInterface(opt ...mockTestInterfaceOption) TestInterface {
+	opts := defaultMockTestInterfaceOptions
+	for _, o := range opt {
+		o(&opts)
+	}
+	return &mockTestInterface{
+		options: opts,
+	}
+}`,
+			},
+		}
+
+		for _, c := range cases {
+			md, err := gomock.Parse("", c.in, "")
+			assert.Nil(t, err)
+
+			out, err := New(md, WriteOpts{
+				Disambiguate: true,
+			}).Write()
+			assert.Nil(t, err)
+			assert.Equal(t, c.out, string(out))
+		}
+	})
 }
