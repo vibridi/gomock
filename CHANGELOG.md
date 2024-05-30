@@ -1,4 +1,9 @@
 
+v3.3.0 / 2024-05-30
+==================
+
+  * Add -d option to disambiguate withFunc identifiers
+
 v3.2.1 / 2024-05-03
 ==================
 
