@@ -400,4 +400,70 @@ func newMockTestInterface(opt ...mockTestInterfaceOption) TestInterface {
 			assert.Equal(t, c.out, string(out))
 		}
 	})
+
+	t.Run("prefix", func(t *testing.T) {
+		cases := []struct {
+			in  string
+			out string
+		}{
+			{
+				in: `
+package foo
+type Interface interface {
+	Get() int
+}
+`,
+				out: `
+type mockFooInterface struct {
+	options mockFooInterfaceOptions
+}
+
+type mockFooInterfaceOptions struct {
+	funcGet func() int
+}
+
+var defaultMockFooInterfaceOptions = mockFooInterfaceOptions{
+	funcGet: func() int {
+		return 0
+	},
+}
+
+type mockFooInterfaceOption func(*mockFooInterfaceOptions)
+
+func WithFuncFooInterfaceGet(f func() int) mockFooInterfaceOption {
+	return func(o *mockFooInterfaceOptions) {
+		o.funcGet = f
+	}
+}
+
+func (m *mockFooInterface) Get() int {
+	return m.options.funcGet()
+}
+
+func NewMockFooInterface(opt ...mockFooInterfaceOption) foo.Interface {
+	opts := defaultMockFooInterfaceOptions
+	for _, o := range opt {
+		o(&opts)
+	}
+	return &mockFooInterface{
+		options: opts,
+	}
+}`,
+			},
+		}
+
+		for _, c := range cases {
+			md, err := gomock.Parse("", c.in, "")
+			assert.Nil(t, err)
+
+			out, err := New(md, WriteOpts{
+				Qualify:       true,
+				Export:        true,
+				Disambiguate:  true,
+				PrefixPackage: true,
+			}).Write()
+			assert.Nil(t, err)
+			assert.Equal(t, c.out, string(out))
+		}
+	})
 }

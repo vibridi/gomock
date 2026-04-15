@@ -9,14 +9,16 @@ import (
 )
 
 type Data struct {
-	Qualify      bool
-	Export       bool
-	Disambiguate bool
-	Package      string
-	ServiceName  string
-	FuncDefs     []*FuncDef
-	UnnamedSig   bool
-	Underlying   map[string]string
+	Qualify       bool
+	Export        bool
+	Disambiguate  bool
+	Package       string
+	ServiceName   string
+	InterfaceName string
+	FuncDefs      []*FuncDef
+	UnnamedSig    bool
+	Underlying    map[string]string
+	PrefixPackage bool
 }
 
 func (td *Data) ToFuncDef(field *ast.Field) *FuncDef {

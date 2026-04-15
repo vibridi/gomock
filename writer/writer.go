@@ -6,6 +6,7 @@ import (
 	"go/format"
 	"strings"
 	"text/template"
+	"unicode"
 
 	"github.com/vibridi/gomock/v3/parser"
 	"github.com/vibridi/gomock/v3/writer/templates"
@@ -19,6 +20,7 @@ type WriteOpts struct {
 	Disambiguate     bool
 	MockName         string
 	Underlying       []string
+	PrefixPackage    bool
 }
 
 type writer struct {
@@ -53,17 +55,25 @@ func (w *writer) Write() ([]byte, error) {
 
 func (w *writer) buildTemplateData() *templates.Data {
 	d := &templates.Data{
-		Qualify:      w.opts.Qualify,
-		Export:       w.opts.Export,
-		Disambiguate: w.opts.Disambiguate,
-		Package:      w.data.PackageName,
-		ServiceName:  w.data.InterfaceName,
-		UnnamedSig:   w.opts.UnnamedSignature,
-		Underlying:   make(map[string]string, len(w.opts.Underlying)),
+		Qualify:       w.opts.Qualify,
+		Export:        w.opts.Export,
+		Disambiguate:  w.opts.Disambiguate,
+		Package:       w.data.PackageName,
+		ServiceName:   w.data.InterfaceName,
+		InterfaceName: w.data.InterfaceName,
+		UnnamedSig:    w.opts.UnnamedSignature,
+		Underlying:    make(map[string]string, len(w.opts.Underlying)),
+		PrefixPackage: w.opts.PrefixPackage,
 	}
 	// Override the service name with the one supplied by the user, if any
 	if w.opts.MockName != "" {
 		d.ServiceName = w.opts.MockName
+	}
+	if w.opts.PrefixPackage {
+		r := []rune(w.data.PackageName)
+		r[0] = unicode.ToUpper(r[0])
+		prefix := string(r)
+		d.ServiceName = prefix + w.data.InterfaceName
 	}
 
 	for _, utype := range w.opts.Underlying {

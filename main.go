@@ -24,16 +24,17 @@ func main() {
 	app.Version = version.Version()
 
 	var (
-		sourceFile   string
-		destination  string
-		target       string
-		noQualify    bool
-		export       bool
-		unnamedsig   bool
-		structStyle  bool
-		mockName     string
-		underlying   cli.StringSlice
-		disambiguate bool
+		sourceFile    string
+		destination   string
+		target        string
+		noQualify     bool
+		export        bool
+		unnamedsig    bool
+		structStyle   bool
+		mockName      string
+		underlying    cli.StringSlice
+		disambiguate  bool
+		prefixPackage bool
 	)
 
 	app.Flags = []cli.Flag{
@@ -70,6 +71,11 @@ func main() {
 			Destination: &disambiguate,
 		},
 		&cli.BoolFlag{
+			Name:        "p",
+			Usage:       "Merge the package name and the mock name in function identifiers, e.g. foo.Client gives NewMockFooClient",
+			Destination: &prefixPackage,
+		},
+		&cli.BoolFlag{
 			Name:        "local",
 			Usage:       "Don't qualify types with the package name",
 			Destination: &noQualify,
@@ -94,6 +100,10 @@ func main() {
 	}
 
 	app.Action = func(c *cli.Context) error {
+		if mockName != "" && prefixPackage {
+			return fmt.Errorf("option conflict: specify only one of --name and -p")
+		}
+
 		if sourceFile == "" {
 			sourceFile = c.Args().Get(0)
 		}
@@ -123,6 +133,7 @@ func main() {
 				Disambiguate:     disambiguate,
 				MockName:         mockName,
 				Underlying:       underlying.Value(),
+				PrefixPackage:    prefixPackage,
 			},
 		)
 		out, err := w.Write()

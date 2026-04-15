@@ -33,7 +33,7 @@ func (m *mock{{.ServiceName}}) {{.Name}}({{.Signature}}) {{.Return}} {
 }
 {{end}}
 
-func {{if .Export}}N{{else}}n{{end}}ewMock{{.ServiceName}}(opt ...mock{{.ServiceName}}Option) {{if .Qualify}}{{.Package}}.{{end}}{{.ServiceName}} {
+func {{if .Export}}N{{else}}n{{end}}ewMock{{.ServiceName}}(opt ...mock{{.ServiceName}}Option) {{if .Qualify}}{{.Package}}.{{end}}{{if and .Qualify .PrefixPackage }}{{.InterfaceName}}{{else}}{{.ServiceName}}{{end}} {
 	opts := defaultMock{{.ServiceName}}Options
 	for _, o := range opt {
 		o(&opts)
