@@ -35,7 +35,9 @@ If not set, the program defaults to the first encountered interface.
 - `-u` if set, allows to output default functions and `With*` functions with unnamed arguments.
 - `-d` if set, outputs top-level `withFunc` function identifiers with the name of the service. This is useful
 to avoid "function redeclared" errors when mocks of interfaces with identical method names exist in the same package. 
-For example, if the service name is `MyService` then `withFuncDoSomething` becomes `withFuncMyServiceDoSomething`. 
+For example, if the service name is `MyService` then `withFuncDoSomething` becomes `withFuncMyServiceDoSomething`.
+- `-p` if set, the package name and the service name are merged together, except when the name is explicitly qualified.
+For example, if the service name is `MyService` and the package name is `foo` then `NewMockMyService` becomes `NewMockFooMyService`.
 - `--local` if set, doesn't qualify output mock types with the package name. It qualifies them by default.
 The default behavior is to always output named arguments, as some IDEs reference them in code completion.
 - `--struct` if set, prints the output in struct style, instead of options style (see below for further details).
