@@ -9,6 +9,7 @@ import (
 	"github.com/vibridi/gomock/v3/internal/fn"
 )
 
+// Holds the data needed to execute the mock template.
 type Data struct {
 	Qualify       bool
 	Export        bool
@@ -27,6 +28,7 @@ type Data struct {
 	typeParamSet map[string]struct{}
 }
 
+// Populates TypeParamList and TypeArguments from the given list of type parameters.
 func (td *Data) AddTypeParameters(typeParams []*ast.Field) {
 	if len(typeParams) == 0 {
 		return

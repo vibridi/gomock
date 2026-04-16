@@ -1,5 +1,6 @@
 # gomock
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/vibridi/gomock/v3.svg)](https://pkg.go.dev/github.com/vibridi/gomock/v3)
 [![Go Report Card](https://goreportcard.com/badge/github.com/vibridi/gomock)](https://goreportcard.com/report/github.com/vibridi/gomock)
 [![Coverage](https://img.shields.io/badge/coverage-80%25-green)](https://img.shields.io/badge/coverage-80%25-green)
 

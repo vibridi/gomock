@@ -12,6 +12,7 @@ type FuncDef struct {
 	ReturnValues string // List of values that can appear in this function's return statement
 }
 
+// Returns a string representation of this FuncDef
 func (fd FuncDef) String() string {
 	s := fd.Name + "(" + fd.Signature + ") " + fd.Return
 	return strings.TrimSpace(s)

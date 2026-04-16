@@ -32,6 +32,7 @@ func New(data *parser.MockData, opts WriteOpts) *writer {
 	return &writer{data, opts}
 }
 
+// Executes the mock template according to the write options
 func (w *writer) Write() ([]byte, error) {
 	if w.data.Len() == 0 {
 		return nil, nil

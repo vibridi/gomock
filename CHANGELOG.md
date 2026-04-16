@@ -1,4 +1,19 @@
 
+v3.5.0 / 2026-04-16
+==================
+
+  * Increase unit test coverage to 80%
+  * Merge pull request #12 from vibridi/generics
+  * Update README file
+  * Report unit test coverage
+  * Modernize github workflow
+  * Support generics in struct mode
+  * Remove helper package
+  * Support mocking generic interfaces
+  * Add TypeParamFields to MockData
+  * Add FuncDef documentation
+  * Update Go version to 1.26.2
+
 v3.4.0 / 2026-04-15
 ===================
 

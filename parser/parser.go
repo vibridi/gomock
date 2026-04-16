@@ -28,6 +28,8 @@ func (md *MockData) Len() int {
 	return len(md.MethodFields) + len(md.Components) + len(md.ExternalComponents)
 }
 
+// Parses srcFile, which must be a valid Go source, and extracts data needed to generate a mock implementation of target.
+// If target is empty, the mocked interface will be the first interface encountered in the Go file.
 func Parse(srcFile string, src interface{}, target string) (*MockData, error) {
 	f, err := parser.ParseFile(token.NewFileSet(), srcFile, src, parser.DeclarationErrors)
 	if err != nil {
@@ -80,6 +82,7 @@ func Parse(srcFile string, src interface{}, target string) (*MockData, error) {
 	return md, nil
 }
 
+// Finds the typespect of the target interface within the given AST file.
 func GetInterfaceSpec(f *ast.File, target string) (*ast.TypeSpec, error) {
 	interfaces, first := findInterfaces(f)
 
