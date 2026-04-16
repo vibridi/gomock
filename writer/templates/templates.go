@@ -55,16 +55,16 @@ func {{if .Export}}N{{else}}n{{end}}ewMock{{.ServiceName}}{{.TypeParamList}}(opt
 }`
 
 const Struct = `
-type {{if .Export}}M{{else}}m{{end}}ock{{.ServiceName}} struct {
+type {{if .Export}}M{{else}}m{{end}}ock{{.ServiceName}}{{.TypeParamList}} struct {
 	{{range .FuncDefs}}{{.Name}}Func  func({{.Signature}}) {{.Return}}
 	{{end}}
 }
 
 {{range .FuncDefs}}
-func (m *{{if $.Export}}M{{else}}m{{end}}ock{{.ServiceName}}) {{.Name}}({{.Signature}}) {{.Return}} {
+func (m *{{if $.Export}}M{{else}}m{{end}}ock{{.ServiceName}}{{$.TypeArguments}}) {{.Name}}({{.Signature}}) {{.Return}} {
 	if m.{{.Name}}Func != nil {
 		{{if .Return}}return m.{{.Name}}Func({{.Args}}){{else}}m.{{.Name}}Func({{.Args}}){{end}}
 	}
-	{{if .Return}}return {{.ReturnValues}}{{end}}
+	{{if .Return}}return {{.ReturnValues}}{{end -}}
 }
 {{end}}`
