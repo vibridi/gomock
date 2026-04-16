@@ -1,6 +1,6 @@
 module github.com/vibridi/gomock/v3
 
-go 1.22.0
+go 1.26.2
 
 require (
 	github.com/stretchr/testify v1.8.4

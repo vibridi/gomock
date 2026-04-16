@@ -64,6 +64,10 @@ func (w *writer) buildTemplateData() *templates.Data {
 		UnnamedSig:    w.opts.UnnamedSignature,
 		Underlying:    make(map[string]string, len(w.opts.Underlying)),
 		PrefixPackage: w.opts.PrefixPackage,
+		// computed
+		FuncDefs:      nil,
+		TypeArguments: "",
+		TypeParamList: "",
 	}
 	// Override the service name with the one supplied by the user, if any
 	if w.opts.MockName != "" {
@@ -83,6 +87,8 @@ func (w *writer) buildTemplateData() *templates.Data {
 		}
 		d.Underlying[t] = u
 	}
+
+	d.AddTypeParameters(w.data.TypeParamFields)
 
 	funcDefs := make([]*templates.FuncDef, 0, len(w.data.MethodFields))
 
