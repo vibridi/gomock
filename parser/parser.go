@@ -44,8 +44,10 @@ func Parse(srcFile string, src interface{}, target string) (*MockData, error) {
 
 	md.InterfaceName = spec.Name.Name
 
-	for _, field := range spec.TypeParams.List {
-		md.TypeParamFields = append(md.TypeParamFields, field)
+	if spec.TypeParams != nil {
+		for _, field := range spec.TypeParams.List {
+			md.TypeParamFields = append(md.TypeParamFields, field)
+		}
 	}
 
 	for _, field := range interfaceType.Methods.List {

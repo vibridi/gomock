@@ -466,4 +466,82 @@ func NewMockFooInterface(opt ...mockFooInterfaceOption) foo.Interface {
 			assert.Equal(t, c.out, string(out))
 		}
 	})
+
+	t.Run("generic interface", func(t *testing.T) {
+		cases := []struct {
+			in  string
+			out string
+		}{
+			{
+				in: `
+package test
+type TestInterface[T any, R ~int] interface {
+	Get() R
+	Foo(v T)
+}
+`,
+				out: `
+type mockTestInterface[T any, R ~int] struct {
+	options mockTestInterfaceOptions[T, R]
+}
+
+type mockTestInterfaceOptions[T any, R ~int] struct {
+	funcGet func() R
+	funcFoo func(v T)
+}
+
+func newDefaultMockTestInterfaceOptions[T any, R ~int]() mockTestInterfaceOptions[T, R] {
+	return mockTestInterfaceOptions[T, R]{
+		funcGet: func() R {
+			return *new(R)
+		},
+		funcFoo: func(v T) {
+			return
+		},
+	}
+}
+
+type mockTestInterfaceOption[T any, R ~int] func(*mockTestInterfaceOptions[T, R])
+
+func withFuncGet[T any, R ~int](f func() R) mockTestInterfaceOption[T, R] {
+	return func(o *mockTestInterfaceOptions[T, R]) {
+		o.funcGet = f
+	}
+}
+
+func withFuncFoo[T any, R ~int](f func(v T)) mockTestInterfaceOption[T, R] {
+	return func(o *mockTestInterfaceOptions[T, R]) {
+		o.funcFoo = f
+	}
+}
+
+func (m *mockTestInterface[T, R]) Get() R {
+	return m.options.funcGet()
+}
+
+func (m *mockTestInterface[T, R]) Foo(v T) {
+	return
+}
+
+func newMockTestInterface[T any, R ~int](opt ...mockTestInterfaceOption[T, R]) TestInterface[T, R] {
+	opts := newDefaultMockTestInterfaceOptions[T, R]()
+	for _, o := range opt {
+		o(&opts)
+	}
+	return &mockTestInterface[T, R]{
+		options: opts,
+	}
+}`,
+			},
+		}
+
+		for _, c := range cases {
+			md, err := gomock.Parse("", c.in, "")
+			assert.Nil(t, err)
+
+			out, err := New(md, WriteOpts{}).Write()
+			assert.Nil(t, err)
+			assert.Equal(t, c.out, string(out))
+		}
+	})
 }

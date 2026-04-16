@@ -2,6 +2,7 @@ package templates
 
 import (
 	"go/ast"
+	"go/token"
 	"strconv"
 	"strings"
 
@@ -19,8 +20,37 @@ type Data struct {
 	UnnamedSig    bool
 	Underlying    map[string]string
 	PrefixPackage bool
+	TypeParamList string // full type parameter list as it appears in the interface declaration
+	TypeArguments string // type argument list as it appears in the method receiver
+
+	// unexported
+	typeParamSet map[string]struct{}
 }
 
+func (td *Data) AddTypeParameters(typeParams []*ast.Field) {
+	if len(typeParams) == 0 {
+		return
+	}
+
+	typeParamNames := make([]string, 0, len(typeParams))
+	typeParamDefs := make([]string, 0, len(typeParams))
+
+	for _, tp := range typeParams {
+		for _, n := range tp.Names {
+			typeParamNames = append(typeParamNames, n.Name)
+			typeParamDefs = append(typeParamDefs, n.Name+" "+td.expressionType(tp.Type))
+		}
+	}
+	td.TypeArguments = "[" + strings.Join(typeParamNames, ",") + "]"
+	td.TypeParamList = "[" + strings.Join(typeParamDefs, ", ") + "]"
+
+	td.typeParamSet = make(map[string]struct{})
+	for _, n := range typeParamNames {
+		td.typeParamSet[n] = struct{}{}
+	}
+}
+
+// TODO rename to AddFuncDef
 func (td *Data) ToFuncDef(field *ast.Field) *FuncDef {
 
 	fn := field.Type.(*ast.FuncType)
@@ -74,7 +104,7 @@ func (td *Data) ToFuncDef(field *ast.Field) *FuncDef {
 func (td *Data) expressionType(expr ast.Expr) string {
 	switch t := expr.(type) {
 	case *ast.Ident:
-		if td.Qualify && ast.IsExported(t.Name) {
+		if td.Qualify && ast.IsExported(t.Name) && !td.isTypeParam(t) {
 			return td.Package + "." + t.Name
 		}
 		return t.Name
@@ -105,6 +135,14 @@ func (td *Data) expressionType(expr ast.Expr) string {
 
 	case *ast.Ellipsis:
 		return "..." + td.expressionType(t.Elt)
+
+	case *ast.UnaryExpr:
+		switch t.Op {
+		case token.TILDE:
+			return "~" + td.expressionType(t.X)
+		default:
+			return td.expressionType(t.X)
+		}
 
 	default:
 		return ""
@@ -191,6 +229,9 @@ func (td *Data) returnValue(expr ast.Expr) string {
 			return "0.0"
 
 		default:
+			if td.isTypeParam(t) {
+				return "*new(" + t.Name + ")"
+			}
 			qname := td.qualifiedName(t)
 			u, ok := td.Underlying[qname]
 			if !ok {
@@ -243,6 +284,11 @@ func (td *Data) qualifiedName(ident *ast.Ident) string {
 		return td.Package + "." + ident.Name
 	}
 	return ident.Name
+}
+
+func (td *Data) isTypeParam(t *ast.Ident) bool {
+	_, ok := td.typeParamSet[t.Name]
+	return ok
 }
 
 func justNames(paramNames []ParamName) []string {
