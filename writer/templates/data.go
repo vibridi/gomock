@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/vibridi/gomock/v3/helper"
+	"github.com/vibridi/gomock/v3/internal/fn"
 )
 
 type Data struct {
@@ -53,49 +53,49 @@ func (td *Data) AddTypeParameters(typeParams []*ast.Field) {
 // TODO rename to AddFuncDef
 func (td *Data) ToFuncDef(field *ast.Field) *FuncDef {
 
-	fn := field.Type.(*ast.FuncType)
+	ftype := field.Type.(*ast.FuncType)
 
 	funcDef := &FuncDef{}
 	funcDef.ServiceName = td.ServiceName
 	funcDef.Name = field.Names[0].Name
 
-	paramNames := make([]ParamName, 0, len(fn.Params.List))
-	paramTypes := make([]string, 0, len(fn.Params.List))
+	paramNames := make([]ParamName, 0, len(ftype.Params.List))
+	paramTypes := make([]string, 0, len(ftype.Params.List))
 
-	for i, p := range fn.Params.List {
+	for i, p := range ftype.Params.List {
 		if len(p.Names) == 0 {
-			paramNames = append(paramNames, td.expressionName(p.Type, "p"+strconv.Itoa(i)))
+			paramNames = append(paramNames, paramName(p.Type, "p"+strconv.Itoa(i)))
 			paramTypes = append(paramTypes, td.expressionType(p.Type))
 
 		} else {
 			for _, n := range p.Names {
-				paramNames = append(paramNames, td.expressionName(p.Type, n.Name))
+				paramNames = append(paramNames, paramName(p.Type, n.Name))
 				paramTypes = append(paramTypes, td.expressionType(p.Type))
 			}
 		}
 	}
 
 	if !td.UnnamedSig {
-		funcDef.Signature = strings.Join(helper.Zips(justNames(paramNames), paramTypes, " "), ", ")
+		funcDef.Signature = strings.Join(fn.Zips(justNames(paramNames), paramTypes, " "), ", ")
 	} else {
 		funcDef.Signature = strings.Join(paramTypes, ", ")
 	}
 
 	funcDef.Args = strings.Join(expandNames(paramNames), ", ")
 
-	if fn.Results == nil {
+	if ftype.Results == nil {
 		return funcDef
 	}
 
-	returnTypes := make([]string, 0, len(fn.Results.List))
-	returnValues := make([]string, 0, len(fn.Results.List))
+	returnTypes := make([]string, 0, len(ftype.Results.List))
+	returnValues := make([]string, 0, len(ftype.Results.List))
 
-	for _, r := range fn.Results.List {
+	for _, r := range ftype.Results.List {
 		returnTypes = append(returnTypes, td.expressionType(r.Type))
 		returnValues = append(returnValues, td.returnValue(r.Type))
 	}
 
-	funcDef.Return = helper.ReturnTypesToString(returnTypes)
+	funcDef.Return = formatReturnTypes(returnTypes)
 	funcDef.ReturnValues = strings.Join(returnValues, ", ")
 
 	return funcDef
@@ -271,11 +271,6 @@ func (td *Data) returnValue(expr ast.Expr) string {
 	}
 }
 
-func (td *Data) expressionName(expr ast.Expr, name string) ParamName {
-	_, isVararg := expr.(*ast.Ellipsis)
-	return ParamName{name, isVararg}
-}
-
 func (td *Data) qualifiedName(ident *ast.Ident) string {
 	if td.Package == "" {
 		return ident.Name
@@ -289,6 +284,11 @@ func (td *Data) qualifiedName(ident *ast.Ident) string {
 func (td *Data) isTypeParam(t *ast.Ident) bool {
 	_, ok := td.typeParamSet[t.Name]
 	return ok
+}
+
+func paramName(expr ast.Expr, name string) ParamName {
+	_, isVararg := expr.(*ast.Ellipsis)
+	return ParamName{name, isVararg}
 }
 
 func justNames(paramNames []ParamName) []string {
@@ -305,4 +305,15 @@ func expandNames(paramNames []ParamName) []string {
 		ss = append(ss, n.Expand())
 	}
 	return ss
+}
+
+func formatReturnTypes(r []string) string {
+	switch len(r) {
+	case 0:
+		return ""
+	case 1:
+		return r[0]
+	default:
+		return "(" + strings.Join(r, ", ") + ")"
+	}
 }

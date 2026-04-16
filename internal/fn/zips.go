@@ -1,6 +1,4 @@
-package helper
-
-import "strings"
+package fn
 
 func Zips(a1, a2 []string, s string) []string {
 	l1 := len(a1)
@@ -25,15 +23,4 @@ func Zips(a1, a2 []string, s string) []string {
 		z = append(z, a1[i]+s+a2[i])
 	}
 	return z
-}
-
-func ReturnTypesToString(r []string) string {
-	switch len(r) {
-	case 0:
-		return ""
-	case 1:
-		return r[0]
-	default:
-		return "(" + strings.Join(r, ", ") + ")"
-	}
 }
