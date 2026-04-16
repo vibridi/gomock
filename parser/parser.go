@@ -12,6 +12,7 @@ import (
 type MockData struct {
 	PackageName           string
 	InterfaceName         string
+	TypeParamFields       []*ast.Field
 	MethodFields          []*ast.Field
 	Components            []*ast.Field
 	ExternalComponents    []*ast.Field
@@ -42,6 +43,10 @@ func Parse(srcFile string, src interface{}, target string) (*MockData, error) {
 	}
 
 	md.InterfaceName = spec.Name.Name
+
+	for _, field := range spec.TypeParams.List {
+		md.TypeParamFields = append(md.TypeParamFields, field)
+	}
 
 	for _, field := range interfaceType.Methods.List {
 		switch field.Type.(type) {
