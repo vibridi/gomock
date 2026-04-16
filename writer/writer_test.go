@@ -1,7 +1,10 @@
 package writer
 
 import (
+	"os"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 
 	gomock "github.com/vibridi/gomock/v3/parser"
 
@@ -18,7 +21,11 @@ func TestWriter(t *testing.T) {
 				in: `
 package test
 type TestInterface interface {
+	foo
 	Get() string
+}
+type foo interface {
+	Do() error
 }
 `,
 				out: `
@@ -63,6 +70,7 @@ func newMockTestInterface(opt ...mockTestInterfaceOption) TestInterface {
 		for _, c := range cases {
 			md, err := gomock.Parse("", c.in, "")
 			assert.Nil(t, err)
+			assert.NotEmpty(t, md.Components)
 
 			out, err := New(md, WriteOpts{}).Write()
 			assert.Nil(t, err)
@@ -105,6 +113,88 @@ func (m *mockTestInterface) Get() string {
 			assert.Nil(t, err)
 			assert.Equal(t, c.out, string(out))
 		}
+	})
+
+	t.Run("inherited methods", func(t *testing.T) {
+		tmpdir := t.TempDir()
+		testgo := `
+package test
+type TestInterface interface {
+	foo
+	Get() string
+}`
+		err := os.MkdirAll(tmpdir+"/test", 0755)
+		require.Nil(t, err)
+		err = os.MkdirAll(tmpdir+"/bar", 0755)
+		require.Nil(t, err)
+
+		err = os.WriteFile(tmpdir+"/test/test.go", []byte(testgo), 0644)
+		require.Nil(t, err)
+
+		foogo := `
+package test
+type foo interface {
+	Do() error
+}`
+		err = os.WriteFile(tmpdir+"/test/foo.go", []byte(foogo), 0644)
+		require.Nil(t, err)
+
+		md, err := gomock.Parse(tmpdir+"/test/test.go", nil, "")
+		require.Nil(t, err)
+
+		want := `
+type mockTestInterface struct {
+	options mockTestInterfaceOptions
+}
+
+type mockTestInterfaceOptions struct {
+	funcGet func() string
+	funcDo  func() error
+}
+
+var defaultMockTestInterfaceOptions = mockTestInterfaceOptions{
+	funcGet: func() string {
+		return ""
+	},
+	funcDo: func() error {
+		return nil
+	},
+}
+
+type mockTestInterfaceOption func(*mockTestInterfaceOptions)
+
+func withFuncGet(f func() string) mockTestInterfaceOption {
+	return func(o *mockTestInterfaceOptions) {
+		o.funcGet = f
+	}
+}
+
+func withFuncDo(f func() error) mockTestInterfaceOption {
+	return func(o *mockTestInterfaceOptions) {
+		o.funcDo = f
+	}
+}
+
+func (m *mockTestInterface) Get() string {
+	return m.options.funcGet()
+}
+
+func (m *mockTestInterface) Do() error {
+	return m.options.funcDo()
+}
+
+func newMockTestInterface(opt ...mockTestInterfaceOption) TestInterface {
+	opts := defaultMockTestInterfaceOptions
+	for _, o := range opt {
+		o(&opts)
+	}
+	return &mockTestInterface{
+		options: opts,
+	}
+}`
+		out, err := New(md, WriteOpts{}).Write()
+		assert.Nil(t, err)
+		assert.Equal(t, want, string(out))
 	})
 
 	t.Run("override name", func(t *testing.T) {

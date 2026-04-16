@@ -180,7 +180,7 @@ func (td *Data) functionType(fn *ast.FuncType) string {
 		return s
 	}
 	s += " ("
-	s += strings.Join(rs, ",")
+	s += strings.Join(rs, ", ")
 	s += ")"
 	return s
 }

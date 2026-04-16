@@ -1,7 +1,7 @@
 # gomock
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/vibridi/gomock)](https://goreportcard.com/report/github.com/vibridi/gomock)
-[![Coverage](https://img.shields.io/badge/coverage-54%25-yellow)](https://img.shields.io/badge/coverage-54%25-yellow)
+[![Coverage](https://img.shields.io/badge/coverage-80%25-green)](https://img.shields.io/badge/coverage-80%25-green)
 
 Automatically generates mock code for unit tests from a Go interface (see below for examples.) Generic interfaces are supported.
 

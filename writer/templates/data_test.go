@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
 	gomock "github.com/vibridi/gomock/v3/parser"
 )
 
@@ -29,9 +30,48 @@ type TestInterface interface {
 )
 
 func TestData(t *testing.T) {
+	t.Run("type parameters", func(t *testing.T) {
+		const src = `
+package test
+type Foo[T any, R ~[]byte] interface { 
+	Get() T 
+}
+`
+		f, err := parser.ParseFile(token.NewFileSet(), "", src, parser.DeclarationErrors)
+		assert.Nil(t, err)
+
+		spec, err := gomock.GetInterfaceSpec(f, "")
+		assert.Nil(t, err)
+
+		td := &Data{
+			Qualify: true,
+		}
+		td.AddTypeParameters(spec.TypeParams.List)
+		assert.Equal(t, "[T any, R ~[]byte]", td.TypeParamList)
+		assert.Equal(t, "[T,R]", td.TypeArguments)
+		_, ok := td.typeParamSet["T"]
+		assert.True(t, ok)
+		_, ok = td.typeParamSet["R"]
+		assert.True(t, ok)
+	})
+
+	t.Run("qualified name", func(t *testing.T) {
+		ident := &ast.Ident{Name: "Foo"}
+		// package empty
+		td := &Data{}
+		assert.Equal(t, "Foo", td.qualifiedName(ident))
+		// no qualify
+		td.Package = "test"
+		assert.Equal(t, "Foo", td.qualifiedName(ident))
+		// local
+		td.Qualify = true
+		assert.Equal(t, "test.Foo", td.qualifiedName(ident))
+	})
+
 	t.Run("write func type", func(t *testing.T) {
 		cases := []string{
 			"func()",                                      // no args
+			"func() (int, error)",                         // return values
 			"func(a string)",                              // one arg identifier
 			"func(c complex128)",                          // one arg identifier
 			"func(string)",                                // one arg no label
@@ -58,7 +98,8 @@ func TestData(t *testing.T) {
 			"func(i interface{})",                          // interface
 			"func(a map[*zap.Logger]test.Test)",            // qualified pointer
 			"func(ch chan int)",                            // chan
-			"func(ch chan map[string]chan<- *zap.Logger)",  // directed chan of complex type
+			"func(ch <-chan int)",                          // directed chan
+			"func(ch chan map[string]chan<- *zap.Logger)",  // directed chan of composite type
 			"func(ss ...string)",                           // vararg
 		}
 
@@ -131,6 +172,9 @@ func TestData(t *testing.T) {
 			"Get() int16":                  "0",
 			"Get() int32":                  "0",
 			"Get() int64":                  "0",
+			"Get() MyInt":                  "0",
+			"Get() float64":                "0.0",
+			"Get() T":                      "*new(T)",
 			"Get() error":                  "nil",
 			"Get() map[string]int":         "nil",
 			"Get() Test":                   "Test{}",
@@ -139,6 +183,7 @@ func TestData(t *testing.T) {
 			"Get() []test.Test":            "nil",
 			"Get() struct{}":               "struct{}{}",
 			"Get() interface{}":            "nil",
+			"Get() chan<- amqp.Delivery":   "nil",
 			"Get() <-chan amqp.Delivery":   "nil",
 			"Get() [2]string":              "[2]string{}",
 			"Get() [2]map[string]struct{}": "[2]map[string]struct{}{}",
@@ -157,7 +202,9 @@ func TestData(t *testing.T) {
 			r := m.Type.(*ast.FuncType).Results.List[0]
 
 			td := &Data{
-				Qualify: true,
+				Qualify:      true,
+				Underlying:   map[string]string{"MyInt": "uint8"},
+				typeParamSet: map[string]struct{}{"T": {}},
 			}
 
 			retval := td.returnValue(r.Type)

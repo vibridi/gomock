@@ -2,11 +2,16 @@ package parser
 
 import (
 	"errors"
+	"fmt"
 	"go/ast"
 	"go/parser"
 	"go/token"
 	"os"
 	"path/filepath"
+)
+
+var (
+	ErrNotFound = errors.New("source does not contain a suitable interface type")
 )
 
 type MockData struct {
@@ -26,7 +31,7 @@ func (md *MockData) Len() int {
 func Parse(srcFile string, src interface{}, target string) (*MockData, error) {
 	f, err := parser.ParseFile(token.NewFileSet(), srcFile, src, parser.DeclarationErrors)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("cannot parse source: %w", err)
 	}
 
 	md := &MockData{}
@@ -81,7 +86,7 @@ func GetInterfaceSpec(f *ast.File, target string) (*ast.TypeSpec, error) {
 	var spec *ast.TypeSpec
 	switch len(interfaces) {
 	case 0:
-		return nil, errors.New("source contains no type declarations")
+		return nil, fmt.Errorf("%w: no interfaces", ErrNotFound)
 
 	case 1:
 		spec = interfaces[first]
@@ -99,7 +104,7 @@ func GetInterfaceSpec(f *ast.File, target string) (*ast.TypeSpec, error) {
 		}
 	}
 	if spec == nil {
-		return nil, errors.New("no suitable type declaration was found in source")
+		return nil, fmt.Errorf("%w: target not found", ErrNotFound)
 	}
 
 	return spec, nil
@@ -215,8 +220,4 @@ func findInterfaces(file *ast.File) (interfaces map[string]*ast.TypeSpec, first 
 		}
 	}
 	return
-}
-
-func filterInterfaces(name string, file *ast.File) {
-
 }

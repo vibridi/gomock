@@ -2,12 +2,11 @@
 
 export GOTOOLCHAIN="go1.26.2+auto"
 
-go test ./... -covermode=count -coverprofile=coverage.out
 COV=$(go tool cover -func=coverage.out | fgrep total | awk '{print $3}' | cut -d. -f1)
 
-if [ "$COV" -le 50 ]; then
+if [ "$COV" -le 49 ]; then
   COLOR="red"
-elif [ "$COV" -le 80 ]; then
+elif [ "$COV" -le 79 ]; then
   COLOR="yellow"
 else
   COLOR="green"

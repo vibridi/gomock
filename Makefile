@@ -37,4 +37,7 @@ test:
 	go test -v ./...
 
 test-cover:
+	GOTOOLCHAIN="go1.26.2+auto" go test ./... -covermode=count -coverprofile=coverage.out
+
+coverage-badge: test-cover
 	./coverage.sh
