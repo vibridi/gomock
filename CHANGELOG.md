@@ -1,4 +1,19 @@
 
+v3.4.0 / 2026-04-15
+===================
+
+  * Add -p option to README
+  * Add -p option to merge package name and interface name
+
+v3.3.0 / 2024-05-30
+===================
+
+  * Bump version to v3.3.0
+  * Add -d option to disambiguate withFunc identifiers
+  * Bump version to v3.2.1
+  * Fix module path when setting VERSION and GOVERSION via ldflags in Makefile
+  * Add goreport.com badge
+
 v3.3.0 / 2024-05-30
 ==================
 
