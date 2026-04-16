@@ -1,4 +1,4 @@
-.PHONY: fmt deps test clean build
+.PHONY: fmt deps test clean build test-cover
 
 VERSION = $(shell git describe --tags)
 GOVERSION = $(shell go version | cut -c 12-)
@@ -34,4 +34,7 @@ example-compose: build
 	./build/gomock -f _example/_composition.go
 
 test:
-	go test -v -cover ./...
+	go test -v ./...
+
+test-cover:
+	./coverage.sh

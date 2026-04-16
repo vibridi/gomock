@@ -1,8 +1,9 @@
 # gomock
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/vibridi/gomock)](https://goreportcard.com/report/github.com/vibridi/gomock)
+[![Coverage](https://img.shields.io/badge/coverage-54%25-yellow)](https://img.shields.io/badge/coverage-54%25-yellow)
 
-Automatically generates mock code from a Go interface.  
+Automatically generates mock code from a Go interface (see below for examples.) It supports generic interfaces.
 
 ### Status
 
@@ -15,7 +16,7 @@ a certain degree of stability and no additional features are needed at this time
 
 ### Requirements:
    
-Go 1.22.0
+Go 1.26.2
 
 
 ## Usage
@@ -58,7 +59,7 @@ This tool is able to resolve composed interfaces, however all declarations must 
 in the same directory or sub-directories relative to the main file. To see this in action, run `make example-compose`.
 
     
-## Example (options style)
+## Examples (options style)
 
 To try out the tool after cloning the repo:
 
@@ -141,7 +142,7 @@ objectThatUsesTestInterface := NewObject(myMock)
 
 ```
 
-## Example (struct style)
+## Examples (struct style)
 
 To print the mock code in struct style, run:
 
@@ -176,10 +177,6 @@ func (m *mockTestInterface) Set(v string)  {
 * **[Gabriele V.](https://github.com/vibridi/)** - *Initial work and maintenance*
 
 Currently there are no other contributors
-
-## TODOs
-
-* Remove extra space between signature and `{` when the function has no return types
 
 ## License
 

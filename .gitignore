@@ -6,3 +6,4 @@ target/
 .idea/
 vendor/
 build/
+coverage.out
