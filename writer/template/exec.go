@@ -19,6 +19,7 @@ type Opts struct {
 	Disambiguate     bool
 	MockName         string
 	Underlying       []string
+	ImportAliases    []string
 	PrefixPackage    bool
 }
 
@@ -54,6 +55,7 @@ func buildData(mock *parser.MockData, opts Opts) *data {
 		InterfaceName: mock.InterfaceName,
 		UnnamedSig:    opts.UnnamedSignature,
 		Underlying:    make(map[string]string, len(opts.Underlying)),
+		Aliases:       make(map[string]string, len(opts.ImportAliases)),
 		PrefixPackage: opts.PrefixPackage,
 		// computed
 		FuncDefs:      nil,
@@ -77,6 +79,14 @@ func buildData(mock *parser.MockData, opts Opts) *data {
 			continue // todo: error message here?
 		}
 		d.Underlying[t] = u
+	}
+
+	for _, alias := range opts.ImportAliases {
+		p, a, ok := strings.Cut(alias, "=")
+		if !ok {
+			continue // todo: error message here?
+		}
+		d.Aliases[p] = a
 	}
 
 	d.AddTypeParameters(mock.TypeParamFields)

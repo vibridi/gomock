@@ -20,6 +20,7 @@ type data struct {
 	FuncDefs      []*funcDef
 	UnnamedSig    bool
 	Underlying    map[string]string
+	Aliases       map[string]string
 	PrefixPackage bool
 	TypeParamList string // full type parameter list as it appears in the interface declaration
 	TypeArguments string // type argument list as it appears in the method receiver
@@ -111,7 +112,11 @@ func (td *data) expressionType(expr ast.Expr) string {
 		return t.Name
 
 	case *ast.SelectorExpr:
-		return t.X.(*ast.Ident).Name + "." + t.Sel.Name
+		pkg := t.X.(*ast.Ident).Name
+		if alias, ok := td.Aliases[pkg]; ok {
+			pkg = alias
+		}
+		return pkg + "." + t.Sel.Name
 
 	case *ast.FuncType:
 		return td.functionType(t)
@@ -243,7 +248,11 @@ func (td *data) returnValue(expr ast.Expr) string {
 		}
 
 	case *ast.SelectorExpr:
-		tname := t.X.(*ast.Ident).Name + "." + t.Sel.Name
+		pkg := t.X.(*ast.Ident).Name
+		if alias, ok := td.Aliases[pkg]; ok {
+			pkg = alias
+		}
+		tname := pkg + "." + t.Sel.Name
 		u, ok := td.Underlying[tname]
 		if ok {
 			return td.returnValue(&ast.Ident{Name: u})

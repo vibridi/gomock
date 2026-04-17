@@ -428,6 +428,71 @@ func newMockTestInterface(opt ...mockTestInterfaceOption) TestInterface {
 		}
 	})
 
+	t.Run("write with package alias and underlying type", func(t *testing.T) {
+		cases := []struct {
+			in  string
+			out string
+		}{
+			{
+				in: `
+package test
+type TestInterface interface {
+	Get() foo.Foo
+}
+`,
+				out: `
+type mockTestInterface struct {
+	options mockTestInterfaceOptions
+}
+
+type mockTestInterfaceOptions struct {
+	funcGet func() foo2.Foo
+}
+
+var defaultMockTestInterfaceOptions = mockTestInterfaceOptions{
+	funcGet: func() foo2.Foo {
+		return 0
+	},
+}
+
+type mockTestInterfaceOption func(*mockTestInterfaceOptions)
+
+func withFuncGet(f func() foo2.Foo) mockTestInterfaceOption {
+	return func(o *mockTestInterfaceOptions) {
+		o.funcGet = f
+	}
+}
+
+func (m *mockTestInterface) Get() foo2.Foo {
+	return m.options.funcGet()
+}
+
+func newMockTestInterface(opt ...mockTestInterfaceOption) TestInterface {
+	opts := defaultMockTestInterfaceOptions
+	for _, o := range opt {
+		o(&opts)
+	}
+	return &mockTestInterface{
+		options: opts,
+	}
+}`,
+			},
+		}
+
+		for _, c := range cases {
+			md, err := gomock.Parse("", c.in, "")
+			assert.Nil(t, err)
+
+			out, err := Exec(md, Opts{
+				Qualify:       false,
+				Underlying:    []string{"foo2.Foo=int"},
+				ImportAliases: []string{"foo=foo2"},
+			})
+			assert.Nil(t, err)
+			assert.Equal(t, c.out, string(out))
+		}
+	})
+
 	t.Run("disambiguate", func(t *testing.T) {
 		cases := []struct {
 			in  string

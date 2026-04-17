@@ -44,7 +44,9 @@ For example, if the service name is `MyService` and the package name is `foo` th
 The default behavior is to always output named arguments, as some IDEs reference them in code completion.
 - `--struct` if set, prints the output in struct style, instead of options style (see below for further details).
 - `--name NAME` allows to override the interface name used in output types with `NAME`.
-- `--utype MAPPING [ --utype MAPPING ]` allows to manually specify the underlying type of a named type.
+- `--pkgs MAPPING [ --pkgs MAPPING ]` maps package names to custom import aliases. `MAPPING` must in the format 'package=alias'. 
+For example `gomock --pkgs foo=foo2` changes `foo.Foo` from the source file to `foo2.Foo`.
+- `--utype MAPPING [ --utype MAPPING ]` allows to manually specify the underlying type of a named type. If the `--pkgs` option is specified, the `MAPPING`'s keys must be the aliased package name. For example `gomock --pkgs foo=foo2 --utype foo2.Foo=int`
 - `--help, -h` prints a help message.
 - `--version, -v` prints the version number.  
 

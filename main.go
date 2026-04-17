@@ -34,6 +34,7 @@ func main() {
 		structStyle   bool
 		mockName      string
 		underlying    cli.StringSlice
+		aliases       cli.StringSlice
 		disambiguate  bool
 		prefixPackage bool
 	)
@@ -94,9 +95,15 @@ func main() {
 		},
 		&cli.StringSliceFlag{
 			Name:        "utype",
-			Usage:       "Maps a type to its underlying type. `MAPPING` must in the format 'type=underlying'",
+			Usage:       "Maps a type to its underlying type. `MAPPING` must in the format 'type=underlying'. If pkgs option is specified, the map key must be the aliased type.",
 			Value:       nil,
 			Destination: &underlying,
+		},
+		&cli.StringSliceFlag{
+			Name:        "pkgs",
+			Usage:       "Maps package names to custom import aliases. `MAPPING` must in the format 'package=alias'",
+			Value:       nil,
+			Destination: &aliases,
 		},
 	}
 
@@ -134,6 +141,7 @@ func main() {
 				Disambiguate:     disambiguate,
 				MockName:         mockName,
 				Underlying:       underlying.Value(),
+				ImportAliases:    aliases.Value(),
 				PrefixPackage:    prefixPackage,
 			},
 		)
