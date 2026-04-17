@@ -1,4 +1,9 @@
 
+v3.7.1 / 2026-04-17
+==================
+
+  * Fix: overwriting file based on notice pos doesn't add extra spaces
+
 v3.7.0 / 2026-04-17
 ==================
 
