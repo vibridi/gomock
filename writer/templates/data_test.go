@@ -154,12 +154,12 @@ type Foo[T any, R ~[]byte] interface {
 			m := spec.Type.(*ast.InterfaceType).Methods.List[0]
 
 			td := &Data{}
+			td.AppendFuncDef(m)
 
-			data := td.ToFuncDef(m)
 			if expected == "_" {
-				assert.Equal(t, method, data.String())
+				assert.Equal(t, method, td.FuncDefs[0].String())
 			} else {
-				assert.Equal(t, expected, data.String())
+				assert.Equal(t, expected, td.FuncDefs[0].String())
 			}
 		}
 	})

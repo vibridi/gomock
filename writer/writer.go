@@ -91,26 +91,22 @@ func (w *writer) buildTemplateData() *templates.Data {
 
 	d.AddTypeParameters(w.data.TypeParamFields)
 
-	funcDefs := make([]*templates.FuncDef, 0, len(w.data.MethodFields))
-
 	for _, field := range w.data.MethodFields {
-		funcDefs = append(funcDefs, d.ToFuncDef(field))
+		d.AppendFuncDef(field)
 	}
 
 	for _, field := range w.data.Components {
 		local := w.data.InheritedMethodFields[field.Type.(*ast.Ident).Name]
 		for _, lm := range local {
-			funcDefs = append(funcDefs, d.ToFuncDef(lm))
+			d.AppendFuncDef(lm)
 		}
 	}
 
 	for _, field := range w.data.ExternalComponents {
 		imported := w.data.InheritedMethodFields[field.Type.(*ast.SelectorExpr).Sel.Name]
 		for _, im := range imported {
-			funcDefs = append(funcDefs, d.ToFuncDef(im))
+			d.AppendFuncDef(im)
 		}
 	}
-
-	d.FuncDefs = funcDefs
 	return d
 }

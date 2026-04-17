@@ -52,9 +52,7 @@ func (td *Data) AddTypeParameters(typeParams []*ast.Field) {
 	}
 }
 
-// TODO rename to AddFuncDef
-func (td *Data) ToFuncDef(field *ast.Field) *FuncDef {
-
+func (td *Data) AppendFuncDef(field *ast.Field) {
 	ftype := field.Type.(*ast.FuncType)
 
 	funcDef := &FuncDef{}
@@ -86,7 +84,8 @@ func (td *Data) ToFuncDef(field *ast.Field) *FuncDef {
 	funcDef.Args = strings.Join(expandNames(paramNames), ", ")
 
 	if ftype.Results == nil {
-		return funcDef
+		td.FuncDefs = append(td.FuncDefs, funcDef)
+		return
 	}
 
 	returnTypes := make([]string, 0, len(ftype.Results.List))
@@ -100,7 +99,7 @@ func (td *Data) ToFuncDef(field *ast.Field) *FuncDef {
 	funcDef.Return = formatReturnTypes(returnTypes)
 	funcDef.ReturnValues = strings.Join(returnValues, ", ")
 
-	return funcDef
+	td.FuncDefs = append(td.FuncDefs, funcDef)
 }
 
 func (td *Data) expressionType(expr ast.Expr) string {
