@@ -53,6 +53,7 @@ func File(destination string, pkg string, text []byte) error {
 		dst.WriteString("\n\n")
 	}
 
+	_, err = dst.WriteString(template.Notice)
 	_, err = dst.Write(text)
 	return err
 }

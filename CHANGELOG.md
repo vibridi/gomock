@@ -1,4 +1,13 @@
 
+v3.6.0 / 2026-04-17
+==================
+
+  * Add writer/file unit test
+  * Write to output file without truncating
+  * Refactor writer package to better encapsulate types
+  * Rename ToFuncDef to AppendFuncDef directly modifying receiver
+  * Add basic method and type docs
+
 v3.5.0 / 2026-04-16
 ==================
 
