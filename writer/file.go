@@ -25,12 +25,13 @@ func File(destination string, pkg string, text []byte) error {
 	}
 
 	pos := 0
+	pad := 0
 	if fi.Size() > 0 {
 		b, err := io.ReadAll(dst)
 		if err != nil {
 			return err
 		}
-		pos, err = getWritePos(b)
+		pos, pad, err = getWritePos(b)
 		if err != nil {
 			return err
 		}
@@ -50,27 +51,36 @@ func File(destination string, pkg string, text []byte) error {
 		}
 
 		dst.WriteString("package " + pkg)
-		dst.WriteString("\n\n")
+		pad = 2
 	}
 
-	_, err = dst.WriteString(template.Notice)
-	_, err = dst.Write(text)
+	for range pad {
+		dst.WriteString("\n")
+	}
+	dst.WriteString(template.Notice)
+	dst.WriteString("\n\n")
+	dst.Write(text)
 	return err
 }
 
-func getWritePos(src []byte) (int, error) {
+// returns the file offset where to start writing and the number of newlines to insert before writing
+func getWritePos(src []byte) (int, int, error) {
 	fset := token.NewFileSet()
 	f, err := parser.ParseFile(fset, "", src, parser.ParseComments)
 	if err != nil {
-		return 0, fmt.Errorf("parse file error: %w", err)
+		return 0, 0, fmt.Errorf("parse file error: %w", err)
 	}
 
-	var pos token.Pos
+	var (
+		pos token.Pos
+		pad int
+	)
 	for _, cmt := range f.Comments {
 		if strings.TrimSpace(cmt.Text()) == strings.Trim(template.Notice, "/ \n") {
 			pos = cmt.Pos()
 		}
 	}
+
 	if pos == 0 {
 		for _, decl := range f.Decls {
 			gen, ok := decl.(*ast.GenDecl)
@@ -78,9 +88,11 @@ func getWritePos(src []byte) (int, error) {
 				pos = max(pos, gen.End())
 			}
 		}
+		pad = 2
 	}
 	if pos == 0 && f.Package.IsValid() {
 		pos = f.Name.End()
+		pad = 2
 	}
-	return fset.Position(pos).Offset, nil
+	return fset.Position(pos).Offset, pad, nil
 }
