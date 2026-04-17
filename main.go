@@ -146,7 +146,7 @@ func main() {
 			return nil
 		}
 
-		if err := writer.File(destination, out); err != nil {
+		if err := writer.File(destination, "", out); err != nil {
 			return fmt.Errorf("failed to write destination file: %w", err)
 		}
 

@@ -12,7 +12,7 @@ import (
 	"github.com/vibridi/gomock/v3/writer/template"
 )
 
-func File(destination string, text []byte) error {
+func File(destination string, pkg string, text []byte) error {
 	dst, err := os.OpenFile(destination, os.O_CREATE|os.O_RDWR, 0644)
 	if err != nil {
 		return err
@@ -41,11 +41,12 @@ func File(destination string, text []byte) error {
 		dst.Seek(0, io.SeekEnd)
 	} else {
 		s := strings.Split(destination, "/")
-		pkg := ""
-		if len(s) > 1 {
-			pkg = s[len(s)-2]
-		} else {
-			pkg = "main"
+		if pkg == "" {
+			if len(s) > 1 {
+				pkg = s[len(s)-2]
+			} else {
+				pkg = "main"
+			}
 		}
 
 		dst.WriteString("package " + pkg)
@@ -65,7 +66,7 @@ func getWritePos(src []byte) (int, error) {
 
 	var pos token.Pos
 	for _, cmt := range f.Comments {
-		if strings.TrimSpace(cmt.Text()) == strings.TrimSpace(strings.Trim(template.Notice, "/")) {
+		if strings.TrimSpace(cmt.Text()) == strings.Trim(template.Notice, "/ \n") {
 			pos = cmt.Pos()
 		}
 	}
@@ -76,6 +77,9 @@ func getWritePos(src []byte) (int, error) {
 				pos = max(pos, gen.End())
 			}
 		}
+	}
+	if pos == 0 && f.Package.IsValid() {
+		pos = f.Name.End()
 	}
 	return fset.Position(pos).Offset, nil
 }
