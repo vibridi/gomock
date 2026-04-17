@@ -1,4 +1,9 @@
 
+v3.6.1 / 2026-04-17
+==================
+
+  * Fix: readd notice when printing output to file
+
 v3.6.0 / 2026-04-17
 ==================
 
