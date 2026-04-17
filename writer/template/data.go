@@ -1,4 +1,4 @@
-package templates
+package template
 
 import (
 	"go/ast"
@@ -10,14 +10,14 @@ import (
 )
 
 // Holds the data needed to execute the mock template.
-type Data struct {
+type data struct {
 	Qualify       bool
 	Export        bool
 	Disambiguate  bool
 	Package       string
 	ServiceName   string
 	InterfaceName string
-	FuncDefs      []*FuncDef
+	FuncDefs      []*funcDef
 	UnnamedSig    bool
 	Underlying    map[string]string
 	PrefixPackage bool
@@ -29,7 +29,7 @@ type Data struct {
 }
 
 // Populates TypeParamList and TypeArguments from the given list of type parameters.
-func (td *Data) AddTypeParameters(typeParams []*ast.Field) {
+func (td *data) AddTypeParameters(typeParams []*ast.Field) {
 	if len(typeParams) == 0 {
 		return
 	}
@@ -52,10 +52,10 @@ func (td *Data) AddTypeParameters(typeParams []*ast.Field) {
 	}
 }
 
-func (td *Data) AppendFuncDef(field *ast.Field) {
+func (td *data) AppendFuncDef(field *ast.Field) {
 	ftype := field.Type.(*ast.FuncType)
 
-	funcDef := &FuncDef{}
+	funcDef := &funcDef{}
 	funcDef.ServiceName = td.ServiceName
 	funcDef.Name = field.Names[0].Name
 
@@ -102,7 +102,7 @@ func (td *Data) AppendFuncDef(field *ast.Field) {
 	td.FuncDefs = append(td.FuncDefs, funcDef)
 }
 
-func (td *Data) expressionType(expr ast.Expr) string {
+func (td *data) expressionType(expr ast.Expr) string {
 	switch t := expr.(type) {
 	case *ast.Ident:
 		if td.Qualify && ast.IsExported(t.Name) && !td.isTypeParam(t) {
@@ -150,7 +150,7 @@ func (td *Data) expressionType(expr ast.Expr) string {
 	}
 }
 
-func (td *Data) functionType(fn *ast.FuncType) string {
+func (td *data) functionType(fn *ast.FuncType) string {
 	s := "func("
 
 	pdecl := make([]string, 0)
@@ -204,7 +204,7 @@ func arrayLength(arr *ast.ArrayType) string {
 	return "[]"
 }
 
-func (td *Data) returnValue(expr ast.Expr) string {
+func (td *data) returnValue(expr ast.Expr) string {
 	switch t := expr.(type) {
 	case *ast.Ident:
 		// the case of an identifier that's not a selector expression is matched by
@@ -272,7 +272,7 @@ func (td *Data) returnValue(expr ast.Expr) string {
 	}
 }
 
-func (td *Data) qualifiedName(ident *ast.Ident) string {
+func (td *data) qualifiedName(ident *ast.Ident) string {
 	if td.Package == "" {
 		return ident.Name
 	}
@@ -282,7 +282,7 @@ func (td *Data) qualifiedName(ident *ast.Ident) string {
 	return ident.Name
 }
 
-func (td *Data) isTypeParam(t *ast.Ident) bool {
+func (td *data) isTypeParam(t *ast.Ident) bool {
 	_, ok := td.typeParamSet[t.Name]
 	return ok
 }

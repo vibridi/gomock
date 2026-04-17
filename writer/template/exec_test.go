@@ -1,4 +1,4 @@
-package writer
+package template
 
 import (
 	"os"
@@ -6,9 +6,9 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	gomock "github.com/vibridi/gomock/v3/parser"
-
 	"github.com/stretchr/testify/assert"
+
+	gomock "github.com/vibridi/gomock/v3/parser"
 )
 
 func TestWriter(t *testing.T) {
@@ -72,7 +72,7 @@ func newMockTestInterface(opt ...mockTestInterfaceOption) TestInterface {
 			assert.Nil(t, err)
 			assert.NotEmpty(t, md.Components)
 
-			out, err := New(md, WriteOpts{}).Write()
+			out, err := Exec(md, Opts{})
 			assert.Nil(t, err)
 			assert.Equal(t, c.out, string(out))
 		}
@@ -109,7 +109,7 @@ func (m *mockTestInterface) Get() string {
 			md, err := gomock.Parse("", c.in, "")
 			assert.Nil(t, err)
 
-			out, err := New(md, WriteOpts{StructStyle: true}).Write()
+			out, err := Exec(md, Opts{StructStyle: true})
 			assert.Nil(t, err)
 			assert.Equal(t, c.out, string(out))
 		}
@@ -192,7 +192,7 @@ func newMockTestInterface(opt ...mockTestInterfaceOption) TestInterface {
 		options: opts,
 	}
 }`
-		out, err := New(md, WriteOpts{}).Write()
+		out, err := Exec(md, Opts{})
 		assert.Nil(t, err)
 		assert.Equal(t, want, string(out))
 	})
@@ -228,10 +228,10 @@ func (m *mockOverridden) Get() string {
 			md, err := gomock.Parse("", c.in, "")
 			assert.Nil(t, err)
 
-			out, err := New(md, WriteOpts{
+			out, err := Exec(md, Opts{
 				StructStyle: true,
 				MockName:    "Overridden",
-			}).Write()
+			})
 			assert.Nil(t, err)
 			assert.Equal(t, c.out, string(out))
 		}
@@ -292,9 +292,9 @@ func newMockTestInterface(opt ...mockTestInterfaceOption) TestInterface {
 			md, err := gomock.Parse("", c.in, "")
 			assert.Nil(t, err)
 
-			out, err := New(md, WriteOpts{
+			out, err := Exec(md, Opts{
 				Underlying: []string{"foo.Foo=int"},
-			}).Write()
+			})
 			assert.Nil(t, err)
 			assert.Equal(t, c.out, string(out))
 		}
@@ -355,10 +355,10 @@ func newMockTestInterface(opt ...mockTestInterfaceOption) test.TestInterface {
 			md, err := gomock.Parse("", c.in, "")
 			assert.Nil(t, err)
 
-			out, err := New(md, WriteOpts{
+			out, err := Exec(md, Opts{
 				Qualify:    true,
 				Underlying: []string{"test.Foo=int"},
-			}).Write()
+			})
 			assert.Nil(t, err)
 			assert.Equal(t, c.out, string(out))
 		}
@@ -419,10 +419,10 @@ func newMockTestInterface(opt ...mockTestInterfaceOption) TestInterface {
 			md, err := gomock.Parse("", c.in, "")
 			assert.Nil(t, err)
 
-			out, err := New(md, WriteOpts{
+			out, err := Exec(md, Opts{
 				Qualify:    false,
 				Underlying: []string{"Foo=int"},
-			}).Write()
+			})
 			assert.Nil(t, err)
 			assert.Equal(t, c.out, string(out))
 		}
@@ -483,9 +483,9 @@ func newMockTestInterface(opt ...mockTestInterfaceOption) TestInterface {
 			md, err := gomock.Parse("", c.in, "")
 			assert.Nil(t, err)
 
-			out, err := New(md, WriteOpts{
+			out, err := Exec(md, Opts{
 				Disambiguate: true,
-			}).Write()
+			})
 			assert.Nil(t, err)
 			assert.Equal(t, c.out, string(out))
 		}
@@ -546,12 +546,12 @@ func NewMockFooInterface(opt ...mockFooInterfaceOption) foo.Interface {
 			md, err := gomock.Parse("", c.in, "")
 			assert.Nil(t, err)
 
-			out, err := New(md, WriteOpts{
+			out, err := Exec(md, Opts{
 				Qualify:       true,
 				Export:        true,
 				Disambiguate:  true,
 				PrefixPackage: true,
-			}).Write()
+			})
 			assert.Nil(t, err)
 			assert.Equal(t, c.out, string(out))
 		}
@@ -629,7 +629,7 @@ func newMockTestInterface[T any, R ~int](opt ...mockTestInterfaceOption[T, R]) T
 			md, err := gomock.Parse("", c.in, "")
 			assert.Nil(t, err)
 
-			out, err := New(md, WriteOpts{}).Write()
+			out, err := Exec(md, Opts{})
 			assert.Nil(t, err)
 			assert.Equal(t, c.out, string(out))
 		}

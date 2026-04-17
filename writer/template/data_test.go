@@ -1,4 +1,4 @@
-package templates
+package template
 
 import (
 	"fmt"
@@ -43,7 +43,7 @@ type Foo[T any, R ~[]byte] interface {
 		spec, err := gomock.GetInterfaceSpec(f, "")
 		assert.Nil(t, err)
 
-		td := &Data{
+		td := &data{
 			Qualify: true,
 		}
 		td.AddTypeParameters(spec.TypeParams.List)
@@ -58,7 +58,7 @@ type Foo[T any, R ~[]byte] interface {
 	t.Run("qualified name", func(t *testing.T) {
 		ident := &ast.Ident{Name: "Foo"}
 		// package empty
-		td := &Data{}
+		td := &data{}
 		assert.Equal(t, "Foo", td.qualifiedName(ident))
 		// no qualify
 		td.Package = "test"
@@ -116,7 +116,7 @@ type Foo[T any, R ~[]byte] interface {
 				Methods.List[0].Type.(*ast.FuncType).
 				Params.List[0].Type.(*ast.FuncType)
 
-			td := &Data{
+			td := &data{
 				Qualify: true,
 			}
 
@@ -153,7 +153,7 @@ type Foo[T any, R ~[]byte] interface {
 
 			m := spec.Type.(*ast.InterfaceType).Methods.List[0]
 
-			td := &Data{}
+			td := &data{}
 			td.AppendFuncDef(m)
 
 			if expected == "_" {
@@ -201,7 +201,7 @@ type Foo[T any, R ~[]byte] interface {
 			m := spec.Type.(*ast.InterfaceType).Methods.List[0]
 			r := m.Type.(*ast.FuncType).Results.List[0]
 
-			td := &Data{
+			td := &data{
 				Qualify:      true,
 				Underlying:   map[string]string{"MyInt": "uint8"},
 				typeParamSet: map[string]struct{}{"T": {}},

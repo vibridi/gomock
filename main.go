@@ -10,6 +10,7 @@ import (
 	"github.com/vibridi/gomock/v3/parser"
 	"github.com/vibridi/gomock/v3/version"
 	"github.com/vibridi/gomock/v3/writer"
+	"github.com/vibridi/gomock/v3/writer/template"
 
 	"github.com/urfave/cli/v2"
 )
@@ -123,9 +124,9 @@ func main() {
 			return err
 		}
 
-		w := writer.New(
+		out, err := template.Exec(
 			md,
-			writer.WriteOpts{
+			template.Opts{
 				Qualify:          !noQualify,
 				Export:           export,
 				UnnamedSignature: unnamedsig,
@@ -136,7 +137,6 @@ func main() {
 				PrefixPackage:    prefixPackage,
 			},
 		)
-		out, err := w.Write()
 		if err != nil {
 			return fmt.Errorf("failed to write output: %w", err)
 		}
@@ -145,7 +145,8 @@ func main() {
 			fmt.Println(string(out))
 			return nil
 		}
-		if err := os.WriteFile(destination, out, 0644); err != nil {
+
+		if err := writer.File(destination, out); err != nil {
 			return fmt.Errorf("failed to write destination file: %w", err)
 		}
 

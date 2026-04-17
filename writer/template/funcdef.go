@@ -1,9 +1,9 @@
-package templates
+package template
 
 import "strings"
 
-// FuncDef represents the information needed to output mocks based on the interface's methods
-type FuncDef struct {
+// funcDef represents the information needed to output mocks based on the interface's methods
+type funcDef struct {
 	ServiceName  string // Name of the interface that is being mocked (can be ovverridden by some options)
 	Name         string // Identifier of this function
 	Signature    string // Full parameter list of this function excluding brackets
@@ -12,8 +12,8 @@ type FuncDef struct {
 	ReturnValues string // List of values that can appear in this function's return statement
 }
 
-// Returns a string representation of this FuncDef
-func (fd FuncDef) String() string {
+// Returns a string representation of this funcDef
+func (fd funcDef) String() string {
 	s := fd.Name + "(" + fd.Signature + ") " + fd.Return
 	return strings.TrimSpace(s)
 }
