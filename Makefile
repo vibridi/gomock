@@ -37,7 +37,7 @@ test:
 	go test -v ./...
 
 test-cover:
-	GOTOOLCHAIN="go1.26.2+auto" go test ./... -covermode=count -coverprofile=coverage.out
-
-coverage-badge: test-cover
-	./coverage.sh
+	GOTOOLCHAIN="go1.26.2+auto" \
+	go test ./... -covermode=count -coverprofile=coverage.out && \
+	echo 'total coverage:' && \
+	go tool cover -func=coverage.out | fgrep total | awk '{print $$3}' | cut -d. -f1

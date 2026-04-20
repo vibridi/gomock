@@ -2,7 +2,7 @@
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/vibridi/gomock/v3.svg)](https://pkg.go.dev/github.com/vibridi/gomock/v3)
 [![Go Report Card](https://goreportcard.com/badge/github.com/vibridi/gomock)](https://goreportcard.com/report/github.com/vibridi/gomock)
-[![Coverage](https://img.shields.io/badge/coverage-81%25-green)](https://img.shields.io/badge/coverage-81%25-green)
+[![codecov](https://codecov.io/github/vibridi/gomock/graph/badge.svg?token=O1C56NGNUV)](https://codecov.io/github/vibridi/gomock)
 
 Automatically generates mock code for unit tests from a Go interface (see below for examples.) Generic interfaces are supported.
 
