@@ -54,7 +54,10 @@ func (td *data) AddTypeParameters(typeParams []*ast.Field) {
 }
 
 func (td *data) AppendFuncDef(field *ast.Field) {
-	ftype := field.Type.(*ast.FuncType)
+	ftype, ok := field.Type.(*ast.FuncType)
+	if !ok {
+		return
+	}
 
 	funcDef := &funcDef{}
 	funcDef.ServiceName = td.ServiceName

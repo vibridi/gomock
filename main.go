@@ -16,6 +16,12 @@ import (
 )
 
 func main() {
+	if err := run(os.Args); err != nil {
+		_, _ = fmt.Fprintf(os.Stderr, "error: %s\n", err.Error())
+	}
+}
+
+func run(args []string) error {
 	app := cli.NewApp()
 
 	app.Name = "gomock"
@@ -161,7 +167,5 @@ func main() {
 		return nil
 	}
 
-	if err := app.Run(os.Args); err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "error: %s\n", err.Error())
-	}
+	return app.Run(args)
 }

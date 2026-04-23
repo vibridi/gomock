@@ -3,9 +3,12 @@ package parser
 import (
 	"go/ast"
 	"go/token"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 const ()
@@ -130,4 +133,57 @@ type TestInterface[T any] interface {
 		assert.Len(t, m, 1)
 		assert.IsType(t, &ast.TypeSpec{}, m["foo"])
 	})
+}
+
+func TestParseDirContent(t *testing.T) {
+	tmp := t.TempDir()
+
+	// Root package
+	rootFile := `
+	package rootpkg
+	
+	type RootInterface interface {
+		RootMethod()
+	}
+	`
+	err := os.WriteFile(filepath.Join(tmp, "root.go"), []byte(rootFile), 0644)
+	require.Nil(t, err)
+
+	// Subdirectory package
+	subDir := filepath.Join(tmp, "subpkg")
+	err = os.Mkdir(subDir, 0755)
+	require.Nil(t, err)
+
+	subFile := `
+	package subpkg
+	
+	type SubInterface interface {
+		SubMethod()
+	}
+	`
+	err = os.WriteFile(filepath.Join(subDir, "sub.go"), []byte(subFile), 0644)
+	require.Nil(t, err)
+
+	// MockData configured to pick up both interfaces
+	md := &MockData{
+		PackageName: "rootpkg",
+		Components: []*ast.Field{
+			{
+				Type: &ast.Ident{Name: "RootInterface"},
+			},
+		},
+		ExternalComponents: []*ast.Field{
+			{
+				Type: &ast.SelectorExpr{
+					X:   &ast.Ident{Name: "subpkg"},
+					Sel: &ast.Ident{Name: "SubInterface"},
+				},
+			},
+		},
+	}
+
+	result, err := parseDirContent(md, tmp)
+	require.Nil(t, err)
+	assert.Equal(t, "RootMethod", result["RootInterface"][0].Names[0].Name)
+	assert.Equal(t, "SubMethod", result["SubInterface"][0].Names[0].Name)
 }

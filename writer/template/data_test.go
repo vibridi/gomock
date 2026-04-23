@@ -30,6 +30,16 @@ type TestInterface interface {
 )
 
 func TestData(t *testing.T) {
+	t.Run("empty type parameters", func(t *testing.T) {
+		td := &data{
+			Qualify: true,
+		}
+		td.AddTypeParameters(nil)
+		assert.Empty(t, td.TypeParamList)
+		assert.Empty(t, td.TypeArguments)
+		assert.Empty(t, td.typeParamSet)
+	})
+
 	t.Run("type parameters", func(t *testing.T) {
 		const src = `
 package test

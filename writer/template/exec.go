@@ -2,6 +2,7 @@ package template
 
 import (
 	"bytes"
+	"fmt"
 	"go/ast"
 	"go/format"
 	"strings"
@@ -29,7 +30,10 @@ func Exec(mock *parser.MockData, opts Opts) ([]byte, error) {
 		return nil, nil
 	}
 
-	d := buildData(mock, opts)
+	d, err := buildData(mock, opts)
+	if err != nil {
+		return nil, err
+	}
 
 	mockTemplate := Options
 	if opts.StructStyle {
@@ -45,7 +49,7 @@ func Exec(mock *parser.MockData, opts Opts) ([]byte, error) {
 	return format.Source(buf.Bytes())
 }
 
-func buildData(mock *parser.MockData, opts Opts) *data {
+func buildData(mock *parser.MockData, opts Opts) (*data, error) {
 	d := &data{
 		Qualify:       opts.Qualify,
 		Export:        opts.Export,
@@ -76,7 +80,7 @@ func buildData(mock *parser.MockData, opts Opts) *data {
 	for _, utype := range opts.Underlying {
 		t, u, ok := strings.Cut(utype, "=")
 		if !ok {
-			continue // todo: error message here?
+			return nil, fmt.Errorf("invalid underlying type option: %s", utype)
 		}
 		d.Underlying[t] = u
 	}
@@ -84,7 +88,7 @@ func buildData(mock *parser.MockData, opts Opts) *data {
 	for _, alias := range opts.ImportAliases {
 		p, a, ok := strings.Cut(alias, "=")
 		if !ok {
-			continue // todo: error message here?
+			return nil, fmt.Errorf("invalid alias option: %s", alias)
 		}
 		d.Aliases[p] = a
 	}
@@ -108,5 +112,5 @@ func buildData(mock *parser.MockData, opts Opts) *data {
 			d.AppendFuncDef(im)
 		}
 	}
-	return d
+	return d, nil
 }

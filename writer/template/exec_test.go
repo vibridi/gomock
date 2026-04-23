@@ -1,6 +1,7 @@
 package template
 
 import (
+	"go/ast"
 	"os"
 	"testing"
 
@@ -11,7 +12,37 @@ import (
 	gomock "github.com/vibridi/gomock/v3/parser"
 )
 
-func TestWriter(t *testing.T) {
+func TestExec(t *testing.T) {
+	t.Run("nothing to do", func(t *testing.T) {
+		b, err := Exec(&gomock.MockData{}, Opts{})
+		assert.Nil(t, b)
+		assert.Nil(t, err)
+	})
+
+	t.Run("bad underlying option", func(t *testing.T) {
+		md := &gomock.MockData{
+			MethodFields: make([]*ast.Field, 1),
+		}
+		b, err := Exec(md, Opts{
+			Underlying: []string{"foo/bar"},
+		})
+		assert.Nil(t, b)
+		assert.NotNil(t, err)
+		assert.Contains(t, err.Error(), "invalid underlying")
+	})
+
+	t.Run("bad alias option", func(t *testing.T) {
+		md := &gomock.MockData{
+			MethodFields: make([]*ast.Field, 1),
+		}
+		b, err := Exec(md, Opts{
+			ImportAliases: []string{"foo/bar"},
+		})
+		assert.Nil(t, b)
+		assert.NotNil(t, err)
+		assert.Contains(t, err.Error(), "invalid alias")
+	})
+
 	t.Run("write options template", func(t *testing.T) {
 		cases := []struct {
 			in  string
@@ -699,4 +730,18 @@ func newMockTestInterface[T any, R ~int](opt ...mockTestInterfaceOption[T, R]) T
 			assert.Equal(t, c.out, string(out))
 		}
 	})
+}
+
+func TestBuildData(t *testing.T) {
+	md := &gomock.MockData{
+		ExternalComponents: []*ast.Field{
+			{Type: &ast.SelectorExpr{Sel: &ast.Ident{Name: "foo"}}},
+		},
+		InheritedMethodFields: map[string][]*ast.Field{
+			"foo": {{Type: &ast.StructType{}}}, // force early return
+		},
+	}
+	d, err := buildData(md, Opts{})
+	require.Nil(t, err)
+	assert.NotNil(t, d)
 }
